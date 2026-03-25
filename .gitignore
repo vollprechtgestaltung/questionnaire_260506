@@ -1,0 +1,13 @@
+# Local settings
+.claude/settings.local.json
+
+# Environment
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db

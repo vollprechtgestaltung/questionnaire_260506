@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "deny": [
+      { "type": "bash", "command": "rm -rf /" },
+      { "type": "bash", "command": "rm -rf ~" },
+      { "type": "bash", "command": "git push --force" },
+      { "type": "bash", "command": "chmod 777" }
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "filesystem": {
+      "denyRead": ["~/", "~/.env", "~/.ssh", "~/.aws", "~/.gnupg"],
+      "allowRead": ["."]
+    },
+    "network": {
+      "allowedDomains": ["github.com", "npmjs.org"]
+    }
+  }
+}
