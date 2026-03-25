@@ -1,0 +1,8 @@
+{
+  "name": "claude-code-base-settings",
+  "version": "1.0.0",
+  "description": "Base settings template for Claude Code projects with DSG/DSGVO compliance",
+  "private": true,
+  "license": "UNLICENSED",
+  "author": "vollprecht gestaltung"
+}
