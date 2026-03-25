@@ -8,6 +8,14 @@
 # Dependencies
 node_modules/
 
+# Keys & Certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.crt
+
 # OS files
 .DS_Store
 Thumbs.db
