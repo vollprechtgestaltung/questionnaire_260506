@@ -60,11 +60,24 @@ Base settings template for vollprecht gestaltung projects.
   Verify Anthropic's DPA covers your use case.
 - Individual accountability: Swiss DSG holds natural persons liable
 
-## Project Structure
+## Project Context
 
-This is a base settings template. When using it in a real project, create
-the appropriate project structure (e.g. `src/`, `tests/`, `docs/`) as needed.
-The template provides only configuration — no application code.
+- Client: Puls Agency
+- Project: puls-questionnaire
+- Deliverable: PWA with a questionnaire. 1 Question and 4 answers-options. After answering the results of all answers are shown. 
+- Recipient: A client of puls pagency. Big Company in the Health business.
+- Out of scope: No Admin panel to change the question and answers. 
+
+## Project Standards
+
+- Work at senior level: minimal, intentional, no over-engineering
+- Structure before speed — a well-considered setup saves more time than fast execution
+- Prefer deleting over adding — less is more
+- No speculative abstractions or "just in case" patterns
+- Scalability and clarity from day one: folder structure, naming, and conventions
+  should make sense to someone seeing the project for the first time
+- If something feels wrong, say so — don't just execute
+- Point out when a request conflicts with good practice, then follow the user's decision
 
 ## Available Skills
 
@@ -80,6 +93,12 @@ Custom slash commands for this project (`.claude/commands/`):
 - Test changes locally before pushing
 - Use Git for version control
 - Ask before making destructive changes
+
+## Before Starting a Task
+
+- Verify no secrets or credentials in changed files
+- Ensure changes and answers belong to the request. 
+- Check for unintended side effects
 
 ## Before Completing a Task
 
