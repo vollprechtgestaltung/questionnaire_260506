@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_2" data-name="Ebene 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g id="_2023" data-name="2023">
+    <g>
+      <rect class="cls-1" width="256" height="256"/>
+      <path class="cls-2" d="M180,160h-24v-24c-13.25,0-24,10.97-24,24.51s10.75,23.49,24,23.49h24v24c13.25,0,24-10.97,24-24.51s-10.75-23.49-24-23.49Z"/>
+      <circle class="cls-2" cx="166" cy="98" r="32"/>
+      <polygon class="cls-2" points="100.36 134 128 70 52 70 79.64 134 100.36 134"/>
+      <rect class="cls-1" width="256" height="256"/>
+      <path class="cls-2" d="M180,160h-24v-24c-13.25,0-24,10.97-24,24.51s10.75,23.49,24,23.49h24v24c13.25,0,24-10.97,24-24.51s-10.75-23.49-24-23.49Z"/>
+      <circle class="cls-2" cx="166" cy="98" r="32"/>
+      <polygon class="cls-2" points="100.36 134 128 70 52 70 79.64 134 100.36 134"/>
+      <rect class="cls-1" width="256" height="256"/>
+      <path class="cls-2" d="M180,160h-24v-24c-13.25,0-24,10.97-24,24.51s10.75,23.49,24,23.49h24v24c13.25,0,24-10.97,24-24.51s-10.75-23.49-24-23.49Z"/>
+      <circle class="cls-2" cx="166" cy="98" r="32"/>
+      <polygon class="cls-2" points="100.36 134 128 70 52 70 79.64 134 100.36 134"/>
+    </g>
+  </g>
+</svg>

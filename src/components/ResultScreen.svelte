@@ -3,6 +3,7 @@
   import { currentScreen, results, connectionStatus } from '../stores/app.js'
   import { supabase } from '../lib/supabase.js'
   import { OPTIONS, RESET_TIMER, POLL_INTERVAL } from '../lib/config.js'
+  import Header from './Header.svelte'
 
   let pollInterval = null
   let resetTimeout = null
@@ -57,6 +58,8 @@
 </script>
 
 <main>
+  <Header />
+  <div class="content">
   <div class="bars">
     {#each percentages as option}
       <div class="row">
@@ -70,16 +73,23 @@
   </div>
 
   <p class="reset-hint">Weiter in {secondsLeft}s</p>
+  </div>
 </main>
 
 <style>
   main {
     display: flex;
     flex-direction: column;
+    height: 100dvh;
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100dvh;
-    padding: 3rem 4rem;
+    padding: 2rem 4rem 3rem;
     gap: 2rem;
   }
 
@@ -106,7 +116,6 @@
 
   .track {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 0.25rem;
     height: 2.5rem;
     overflow: hidden;
   }
@@ -114,7 +123,6 @@
   .bar {
     height: 100%;
     background: currentColor;
-    border-radius: 0.25rem;
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 0%;
   }

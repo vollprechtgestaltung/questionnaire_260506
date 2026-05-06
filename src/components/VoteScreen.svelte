@@ -3,6 +3,7 @@
   import { currentScreen, connectionStatus, deviceId } from '../stores/app.js'
   import { supabase, pingSupabase } from '../lib/supabase.js'
   import { QUESTION, OPTIONS, VOTE_RETRY_ATTEMPTS } from '../lib/config.js'
+  import Header from './Header.svelte'
 
   let voted = false
   let error = null
@@ -72,7 +73,11 @@
 </script>
 
 <main>
-  <h1>{QUESTION}</h1>
+  <Header />
+
+  <div class="question">
+    <h1>{QUESTION}</h1>
+  </div>
 
   <div class="options">
     {#each OPTIONS as option}
@@ -94,11 +99,15 @@
   main {
     display: flex;
     flex-direction: column;
+    height: 100dvh;
+  }
+
+  .question {
+    height: calc(50vh - 5rem);
+    display: flex;
     align-items: center;
     justify-content: center;
-    height: 100dvh;
-    padding: 2rem;
-    gap: 3rem;
+    padding: 0 2rem;
   }
 
   h1 {
@@ -111,19 +120,21 @@
   .options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    width: 100%;
-    max-width: 900px;
+    width: 100vw;
+    background: var(--bg);
+    gap: 0;
+    padding: 4px;
   }
 
   button {
-    padding: 2rem 1.5rem;
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    width: 100%;
+    height: 25vh;
+    font-size: clamp(1rem, 2.5vw, 2rem);
     font-weight: 500;
-    border: 2px solid currentColor;
-    background: transparent;
+    color: inherit;
+    border: 2px solid var(--bg);
+    background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
-    border-radius: 0.5rem;
     transition: background 0.15s, color 0.15s;
     text-align: center;
     line-height: 1.3;

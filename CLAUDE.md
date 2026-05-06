@@ -28,6 +28,17 @@ Base settings template for vollprecht gestaltung projects.
 - Commit messages: imperative mood, max 72 chars subject line
 - One logical change per commit
 
+## ABSOLUTE RULE: No Worktrees, No Unauthorized Branches
+
+**NEVER create a git worktree or a new branch without explicit user instruction.**
+
+- Always work directly on the `main` branch in the project root
+- Never use `isolation: "worktree"` in any Agent tool call — ever
+- Never run `git worktree add` or `git checkout -b` unless the user explicitly asks
+- If Claude Code is running in a worktree already (check with `git worktree list`),
+  flag this to the user immediately — do not silently continue in a worktree
+- This rule has been violated multiple times. It is non-negotiable.
+
 ## Settings
 
 - Sandbox and permissions configured in `.claude/settings.json`

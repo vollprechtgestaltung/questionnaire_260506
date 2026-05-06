@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.4"
+    "@supabase/supabase-js": "^2.105.3"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
