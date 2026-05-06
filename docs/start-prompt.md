@@ -40,9 +40,16 @@ Mehrere iPads schreiben gleichzeitig in dieselbe Datenbank.
 
 votes: id (uuid), option (1–4), device_id, timestamp
 
-## Noch offen — vor dem Coden klären
+## Frageinhalt
 
-- Exakter Fragetext und 4 Antworten
-- Logo/Branding-Assets vorhanden?
-- Reset-Timer: wie viele Sekunden soll das Ergebnis sichtbar sein?
+- Frage: "Was verändert diese Erfahrung für Sie?"
+- A1: Eine neue Perspektive
+- A2: Mehr Empathie
+- A3: Besseres Verständnis
+- A4: Verstärkter Handlungsbedarf
+
+## Konfiguration
+
+- Reset-Timer: 60 Sekunden (konfigurierbare Konstante)
+- Branding: vorerst kein — wird später ergänzt
 ```
