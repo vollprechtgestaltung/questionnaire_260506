@@ -77,7 +77,7 @@
   </div>
   <div class="statusbar">
     <span>{total} Antworten</span>
-    <span class="center">Weiter in {secondsLeft}s</span>
+    <button class="skip" onclick={() => currentScreen.set('vote')}>{secondsLeft}s</button>
     <span></span>
   </div>
 </main>
@@ -143,9 +143,18 @@
     font-weight: 700;
   }
 
+  .skip {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-align: center;
+  }
+
   .statusbar {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
     padding: 1rem 2rem;
     font-size: 0.85rem;
