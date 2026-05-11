@@ -21,13 +21,20 @@
   }
 
   :global(:root) {
-    --bg: #0a0a0a;
-    --fg: #f5f5f5;
+    --bg: #f5f5f5;
+    --fg: #0a0a0a;
+    --surface: rgba(0, 0, 0, 0.08);
     font-family: system-ui, -apple-system, sans-serif;
     font-size: 16px;
     -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
     user-select: none;
+  }
+
+  :global(:root[data-theme="dark"]) {
+    --bg: #0a0a0a;
+    --fg: #f5f5f5;
+    --surface: rgba(255, 255, 255, 0.1);
   }
 
   :global(body) {

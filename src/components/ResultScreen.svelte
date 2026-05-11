@@ -115,7 +115,7 @@
   }
 
   .track {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface);
     height: 2.5rem;
     overflow: hidden;
   }

@@ -107,7 +107,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 2rem;
+    padding: 0 2rem 10%;
   }
 
   h1 {
@@ -133,7 +133,7 @@
     font-weight: 500;
     color: inherit;
     border: 2px solid var(--bg);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface);
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
     text-align: center;

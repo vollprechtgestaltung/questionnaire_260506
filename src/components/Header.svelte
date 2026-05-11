@@ -1,6 +1,17 @@
+<script>
+  let dark = $state(document.documentElement.dataset.theme === 'dark')
+
+  function toggle() {
+    dark = !dark
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  }
+</script>
+
 <header>
-  <span class="brand">vollprecht gestaltung</span>
-  <img src="/logo.svg" alt="Logo" class="logo" />
+  <span class="brand">brand name</span>
+  <button class="toggle" onclick={toggle} aria-label="Theme wechseln" class:dark>
+    <span class="knob"></span>
+  </button>
 </header>
 
 <style>
@@ -14,14 +25,34 @@
   }
 
   .brand {
-    font-size: clamp(1rem, 2vw, 1.66rem);
+    font-size: clamp(1rem, 2.5vw, 2rem);
     font-weight: 500;
     color: var(--fg);
   }
 
-  .logo {
-    height: 100%;
-    aspect-ratio: 1;
-    padding: 0.75rem 0;
+  .toggle {
+    position: relative;
+    width: 3rem;
+    height: 1.6rem;
+    border-radius: 1rem;
+    border: 2px solid rgba(128, 128, 128, 0.4);
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: rgba(128, 128, 128, 0.4);
+    transition: transform 0.2s ease;
+  }
+
+  .toggle.dark .knob {
+    transform: translateX(1.25rem);
   }
 </style>
