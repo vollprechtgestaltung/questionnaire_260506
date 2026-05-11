@@ -72,7 +72,11 @@
     {/each}
   </div>
 
-  <p class="reset-hint">Weiter in {secondsLeft}s</p>
+  </div>
+  <div class="statusbar">
+    <span>{total} Antworten</span>
+    <span class="center">Weiter in {secondsLeft}s</span>
+    <span></span>
   </div>
 </main>
 
@@ -134,9 +138,12 @@
     text-align: right;
   }
 
-  .reset-hint {
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
     font-size: 0.85rem;
     opacity: 0.4;
-    margin-top: 1rem;
   }
 </style>
