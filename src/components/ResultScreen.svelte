@@ -63,11 +63,13 @@
   <div class="bars">
     {#each percentages as option}
       <div class="row">
-        <span class="label">{option.label}</span>
+        <div class="row-header">
+          <span class="label">{option.label}</span>
+          <span class="pct">{option.pct}%</span>
+        </div>
         <div class="track">
           <div class="bar" style="width: {option.pct}%"></div>
         </div>
-        <span class="pct">{option.pct}%</span>
       </div>
     {/each}
   </div>
@@ -93,7 +95,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem 4rem 3rem;
+    padding: 2rem 2rem 3rem;
     gap: 2rem;
   }
 
@@ -106,22 +108,27 @@
   }
 
   .row {
-    display: grid;
-    grid-template-columns: 1fr 2fr auto;
-    align-items: center;
-    gap: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
   }
 
   .label {
     font-size: clamp(0.9rem, 2vw, 1.2rem);
     font-weight: 500;
-    text-align: right;
   }
 
   .track {
     background: var(--surface);
     height: 2.5rem;
     overflow: hidden;
+    width: 100%;
   }
 
   .bar {
@@ -134,8 +141,6 @@
   .pct {
     font-size: clamp(1rem, 2vw, 1.3rem);
     font-weight: 700;
-    min-width: 3.5ch;
-    text-align: right;
   }
 
   .statusbar {
