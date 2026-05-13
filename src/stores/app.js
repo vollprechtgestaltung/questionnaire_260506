@@ -12,6 +12,9 @@ export const connectionStatus = writable('ok')
 // Counter of consecutive backend failures (used for captive portal detection)
 export const consecutiveFailures = writable(0)
 
+// True when a new service worker is waiting; app should reload at next idle moment
+export const updateAvailable = writable(false)
+
 // Persistent device ID — generated once, stored in localStorage
 function getDeviceId() {
   const key = 'puls_device_id'

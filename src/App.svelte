@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import { currentScreen } from './stores/app.js'
+  import { currentScreen, updateAvailable } from './stores/app.js'
   import VoteScreen from './components/VoteScreen.svelte'
   import ResultScreen from './components/ResultScreen.svelte'
   import ConnectionIndicator from './components/ConnectionIndicator.svelte'
@@ -11,6 +11,14 @@
     console.error('App crash:', error)
     setTimeout(() => window.location.reload(), 3000)
   }
+
+  // Reload only when on vote screen and idle — never mid-vote.
+  // Updates wait until the natural reset cycle brings us back to vote.
+  $effect(() => {
+    if ($updateAvailable && $currentScreen === 'vote') {
+      window.location.reload()
+    }
+  })
 
   async function acquireWakeLock() {
     if ('wakeLock' in navigator) {
