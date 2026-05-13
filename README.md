@@ -56,7 +56,11 @@ IP-Adresse wird im Terminal angezeigt. iPad muss im gleichen WLAN sein.
 3. Umgebungsvariablen in Vercel setzen:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
+   - `CRON_SECRET` (optional, schützt Heartbeat-Endpoint)
 4. Deploy — Build-Command: `npm run build`, Output: `dist/`
+
+Der Vercel-Cron in `vercel.json` hält das Supabase-Projekt im Free-Tier
+aktiv (siehe `docs/heartbeat.md`).
 
 ---
 

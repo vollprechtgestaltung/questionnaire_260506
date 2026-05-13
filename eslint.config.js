@@ -32,5 +32,14 @@ export default [
         AbortController: 'readonly'
       }
     }
+  },
+  {
+    files: ['api/**/*.js'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        fetch: 'readonly'
+      }
+    }
   }
 ]
