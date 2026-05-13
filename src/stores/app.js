@@ -1,10 +1,13 @@
 import { writable } from 'svelte/store'
+import { loadCachedResults, loadCachedTimestamp } from '../lib/cache.js'
 
 // Current screen: 'vote' | 'result'
 export const currentScreen = writable('vote')
 
 // Vote results: { 1: count, 2: count, 3: count, 4: count }
-export const results = writable({ 1: 0, 2: 0, 3: 0, 4: 0 })
+// Hydrated from localStorage so visitors don't see "0 Antworten" after
+// an offline reload (e.g. iPad wake-from-standby during MiFi hiccup).
+export const results = writable(loadCachedResults())
 
 // Connection status: 'ok' | 'error' | 'offline' | 'unreachable'
 export const connectionStatus = writable('ok')
@@ -16,8 +19,9 @@ export const consecutiveFailures = writable(0)
 export const updateAvailable = writable(false)
 
 // Unix timestamp (ms) of the last successful Supabase response. Used to display
-// "vor Xs" on the result screen.
-export const lastFetchAt = writable(null)
+// "vor Xs" on the result screen. Hydrated from cache so the age label stays
+// honest across reloads.
+export const lastFetchAt = writable(loadCachedTimestamp())
 
 // Persistent device ID — generated once, stored in localStorage
 function getDeviceId() {

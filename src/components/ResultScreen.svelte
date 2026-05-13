@@ -6,6 +6,7 @@
   import { flushQueue } from '../lib/vote.js'
   import { getQueueCounts, mergeResults, calcPercentages } from '../lib/results.js'
   import { reportSuccess, reportFailure, backoffDelay } from '../lib/connection.js'
+  import { saveCachedResults } from '../lib/cache.js'
   import { RESET_TIMER } from '../lib/config.js'
   import Header from './Header.svelte'
 
@@ -37,6 +38,7 @@
       const counts = { 1: 0, 2: 0, 3: 0, 4: 0 }
       data.forEach(row => { counts[row.option] = Number(row.count) })
       results.set(counts)
+      saveCachedResults(counts)
       reportSuccess()
       await flushQueue()
       refreshQueueCounts()
@@ -84,7 +86,8 @@
   }
 
   onMount(async () => {
-    results.set({ 1: 0, 2: 0, 3: 0, 4: 0 })
+    // Don't reset results here — the store is hydrated from cache.
+    // The bars animate from 0% via the `animated` flag below.
     refreshQueueCounts()
     await fetchResults()
     requestAnimationFrame(() => {
