@@ -1,15 +1,15 @@
 <script>
   import { onMount } from 'svelte'
   import { currentScreen, connectionStatus, deviceId } from '../stores/app.js'
-  import { supabase, pingSupabase } from '../lib/supabase.js'
-  import { QUESTION, OPTIONS, VOTE_RETRY_ATTEMPTS } from '../lib/config.js'
-  import { saveToQueue } from '../lib/queue.js'
+  import { pingSupabase } from '../lib/supabase.js'
+  import { submitVote as sendVote } from '../lib/vote.js'
+  import { QUESTION, OPTIONS } from '../lib/config.js'
   import Header from './Header.svelte'
 
   let voted = false
+  let submitting = false
 
   onMount(async () => {
-    // Smoke test on mount
     const ok = await pingSupabase()
     connectionStatus.set(ok ? 'ok' : 'error')
   })
@@ -20,26 +20,10 @@
 
     const vote = { id: crypto.randomUUID(), option: optionId, device_id: deviceId }
 
-    let attempt = 0
-    while (attempt < VOTE_RETRY_ATTEMPTS) {
-      try {
-        const { error } = await supabase.from('votes').insert(vote)
-
-        if (!error) {
-          connectionStatus.set('ok')
-          currentScreen.set('result')
-          return
-        }
-
-        attempt++
-      } catch {
-        attempt++
-      }
-    }
-
-    // All retries failed — queue locally, show results anyway
-    saveToQueue(vote)
-    connectionStatus.set('error')
+    submitting = true
+    const { status, reason } = await sendVote(vote)
+    connectionStatus.set(status === 'ok' ? 'ok' : reason === 'offline' ? 'offline' : 'error')
+    submitting = false
     currentScreen.set('result')
   }
 </script>
@@ -51,16 +35,22 @@
     <h1>{QUESTION}</h1>
   </div>
 
-  <div class="options">
-    {#each OPTIONS as option}
-      <button
-        disabled={voted}
-        onclick={() => submitVote(option.id)}
-      >
-        {option.label}
-      </button>
-    {/each}
-  </div>
+  {#if submitting}
+    <div class="loader-overlay">
+      <div class="spinner"></div>
+    </div>
+  {:else}
+    <div class="options">
+      {#each OPTIONS as option}
+        <button
+          disabled={voted}
+          onclick={() => submitVote(option.id)}
+        >
+          {option.label}
+        </button>
+      {/each}
+    </div>
+  {/if}
 
 </main>
 
@@ -117,6 +107,26 @@
   button:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  .loader-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+  }
+
+  .spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid var(--surface);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
 </style>

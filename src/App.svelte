@@ -32,9 +32,8 @@
   })
 </script>
 
-<ConnectionIndicator />
-
 {#if $currentScreen === 'vote'}
+  <ConnectionIndicator />
   <VoteScreen />
 {:else if $currentScreen === 'result'}
   <ResultScreen />

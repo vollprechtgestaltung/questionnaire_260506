@@ -2,35 +2,41 @@
   import { onMount, onDestroy } from 'svelte'
   import { currentScreen, results, connectionStatus } from '../stores/app.js'
   import { supabase } from '../lib/supabase.js'
+  import { flushQueue } from '../lib/vote.js'
+  import { getQueue } from '../lib/queue.js'
   import { OPTIONS, RESET_TIMER, POLL_INTERVAL } from '../lib/config.js'
-  import { getQueue, removeFromQueue } from '../lib/queue.js'
   import Header from './Header.svelte'
 
   let pollInterval = null
   let resetTimeout = null
   let secondsLeft = RESET_TIMER
+  let animated = false
+  let fetching = false
 
-  // Derived: total votes and percentages
-  $: total = Object.values($results).reduce((s, n) => s + n, 0)
+  let queueCounts = {}
+
+  $: merged = OPTIONS.reduce((acc, o) => {
+    acc[o.id] = ($results[o.id] ?? 0) + (queueCounts[o.id] ?? 0)
+    return acc
+  }, {})
+  $: total = Object.values(merged).reduce((s, n) => s + n, 0)
   $: percentages = OPTIONS.map(o => ({
     ...o,
-    count: $results[o.id] ?? 0,
-    pct: total > 0 ? Math.round(($results[o.id] ?? 0) / total * 100) : 0
+    count: merged[o.id] ?? 0,
+    pct: total > 0 ? Math.round((merged[o.id] ?? 0) / total * 100) : 0
   }))
 
-  async function flushQueue() {
-    const queue = getQueue()
-    for (const vote of queue) {
-      try {
-        const { error } = await supabase.from('votes').insert(vote)
-        if (!error) removeFromQueue(vote.id)
-      } catch {
-        // Will retry on next poll cycle
-      }
+  function refreshQueueCounts() {
+    const counts = {}
+    for (const vote of getQueue()) {
+      counts[vote.option] = (counts[vote.option] ?? 0) + 1
     }
+    queueCounts = counts
   }
 
   async function fetchResults() {
+    if (fetching) return
+    fetching = true
     try {
       const { data, error } = await supabase.rpc('get_vote_counts')
 
@@ -40,9 +46,13 @@
       data.forEach(row => { counts[row.option] = Number(row.count) })
       results.set(counts)
       connectionStatus.set('ok')
-      flushQueue()
+      await flushQueue()
+      refreshQueueCounts()
     } catch {
       connectionStatus.set('error')
+      refreshQueueCounts()
+    } finally {
+      fetching = false
     }
   }
 
@@ -58,7 +68,10 @@
   }
 
   onMount(async () => {
+    results.set({ 1: 0, 2: 0, 3: 0, 4: 0 })
+    refreshQueueCounts()
     await fetchResults()
+    requestAnimationFrame(() => { animated = true })
     startResetCountdown()
     pollInterval = setInterval(fetchResults, POLL_INTERVAL)
   })
@@ -80,7 +93,7 @@
           <span class="pct">{option.pct}%</span>
         </div>
         <div class="track">
-          <div class="bar" style="width: {option.pct}%"></div>
+          <div class="bar" style="width: {animated ? option.pct : 0}%"></div>
         </div>
       </div>
     {/each}
@@ -90,7 +103,10 @@
   <div class="statusbar">
     <span>{total} Antworten</span>
     <button class="skip" onclick={() => currentScreen.set('vote')}>{secondsLeft}s</button>
-    <span></span>
+    <span class="connection" data-status={$connectionStatus}>
+      <span class="dot"></span>
+      {#if $connectionStatus === 'ok'}Online{:else if $connectionStatus === 'offline'}Offline{:else}Verbindungsfehler{/if}
+    </span>
   </div>
 </main>
 
@@ -172,4 +188,21 @@
     font-size: 0.85rem;
     opacity: 0.4;
   }
+
+  .connection {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
+
+  .connection .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  [data-status='ok'] .dot { background: #48bb78; }
+  [data-status='error'] .dot { background: #e53e3e; }
+  [data-status='offline'] .dot { background: #ecc94b; }
 </style>
