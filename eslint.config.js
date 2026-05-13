@@ -28,7 +28,8 @@ export default [
         setInterval: 'readonly',
         clearInterval: 'readonly',
         requestAnimationFrame: 'readonly',
-        Promise: 'readonly'
+        Promise: 'readonly',
+        AbortController: 'readonly'
       }
     }
   }

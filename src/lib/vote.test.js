@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { withTimeout } from './vote.js'
+import { withAbortableTimeout } from './vote.js'
 
 // --- localStorage mock ---
 const storageMap = {}
@@ -15,10 +15,20 @@ function clearStorage() {
 }
 
 // --- supabase mock ---
+// supabase.from('votes').insert(vote).abortSignal(signal) returns a Promise.
+// Capture the last passed signal so tests can assert abort behaviour.
 const insertMock = vi.fn()
+let lastSignal = null
 vi.mock('./supabase.js', () => ({
   supabase: {
-    from: () => ({ insert: insertMock })
+    from: () => ({
+      insert: (vote) => ({
+        abortSignal: (signal) => {
+          lastSignal = signal
+          return insertMock(vote)
+        }
+      })
+    })
   }
 }))
 
@@ -28,15 +38,31 @@ const { getQueue, saveToQueue } = await import('./queue.js')
 
 const vote = () => ({ id: 'test-uuid', option: 1, device_id: 'dev-1' })
 
-describe('withTimeout', () => {
-  it('resolves if promise is faster than timeout', async () => {
-    const result = await withTimeout(Promise.resolve('ok'), 1000)
+describe('withAbortableTimeout', () => {
+  it('resolves when the request finishes before the timeout', async () => {
+    const result = await withAbortableTimeout(async () => 'ok', 1000)
     expect(result).toBe('ok')
   })
 
-  it('rejects if promise is slower than timeout', async () => {
-    const slow = new Promise((resolve) => setTimeout(() => resolve('late'), 500))
-    await expect(withTimeout(slow, 50)).rejects.toThrow('timeout')
+  it('aborts the request when timeout fires', async () => {
+    let capturedSignal = null
+    const slow = (signal) => {
+      capturedSignal = signal
+      return new Promise((_, reject) => {
+        signal.addEventListener('abort', () => reject(new Error('aborted')))
+      })
+    }
+    await expect(withAbortableTimeout(slow, 50)).rejects.toThrow('aborted')
+    expect(capturedSignal.aborted).toBe(true)
+  })
+
+  it('passes a non-aborted signal initially', async () => {
+    let capturedSignal = null
+    await withAbortableTimeout(async (signal) => {
+      capturedSignal = signal
+      return 'ok'
+    }, 1000)
+    expect(capturedSignal.aborted).toBe(false)
   })
 })
 
@@ -92,7 +118,13 @@ describe('submitVote', () => {
   })
 
   it('queues vote when insert times out', async () => {
-    insertMock.mockImplementation(() => new Promise(() => {})) // never resolves
+    // Simulate Supabase honouring the abort signal
+    insertMock.mockImplementation(
+      () =>
+        new Promise((_, reject) => {
+          lastSignal?.addEventListener('abort', () => reject(new Error('aborted')))
+        })
+    )
     const v = vote()
     const result = await submitVote(v)
     expect(result).toEqual({ status: 'queued', reason: 'retries_exhausted' })
