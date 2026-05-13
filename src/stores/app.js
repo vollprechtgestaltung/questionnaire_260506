@@ -6,8 +6,11 @@ export const currentScreen = writable('vote')
 // Vote results: { 1: count, 2: count, 3: count, 4: count }
 export const results = writable({ 1: 0, 2: 0, 3: 0, 4: 0 })
 
-// Connection status: 'ok' | 'error' | 'offline'
+// Connection status: 'ok' | 'error' | 'offline' | 'unreachable'
 export const connectionStatus = writable('ok')
+
+// Counter of consecutive backend failures (used for captive portal detection)
+export const consecutiveFailures = writable(0)
 
 // Persistent device ID — generated once, stored in localStorage
 function getDeviceId() {

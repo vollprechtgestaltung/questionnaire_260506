@@ -82,6 +82,9 @@
     color: var(--fg);
     height: 100dvh;
     overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
   }
 
   :global(#app) {

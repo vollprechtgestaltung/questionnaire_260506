@@ -1,17 +1,32 @@
 <script>
-  import { onMount } from 'svelte'
-  import { currentScreen, connectionStatus, deviceId } from '../stores/app.js'
+  import { onMount, onDestroy } from 'svelte'
+  import { currentScreen, deviceId } from '../stores/app.js'
   import { pingSupabase } from '../lib/supabase.js'
   import { submitVote as sendVote } from '../lib/vote.js'
+  import { reportSuccess, reportFailure } from '../lib/connection.js'
   import { QUESTION, OPTIONS } from '../lib/config.js'
   import Header from './Header.svelte'
 
   let voted = $state(false)
   let submitting = $state(false)
 
-  onMount(async () => {
+  async function checkConnection() {
     const ok = await pingSupabase()
-    connectionStatus.set(ok ? 'ok' : 'error')
+    if (ok) reportSuccess()
+    else reportFailure()
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState === 'visible') checkConnection()
+  }
+
+  onMount(() => {
+    checkConnection()
+    document.addEventListener('visibilitychange', onVisibilityChange)
+  })
+
+  onDestroy(() => {
+    document.removeEventListener('visibilitychange', onVisibilityChange)
   })
 
   async function submitVote(optionId) {
@@ -21,8 +36,9 @@
     const vote = { id: crypto.randomUUID(), option: optionId, device_id: deviceId }
 
     submitting = true
-    const { status, reason } = await sendVote(vote)
-    connectionStatus.set(status === 'ok' ? 'ok' : reason === 'offline' ? 'offline' : 'error')
+    const { status } = await sendVote(vote)
+    if (status === 'ok') reportSuccess()
+    else reportFailure()
     submitting = false
     currentScreen.set('result')
   }

@@ -1,14 +1,16 @@
 <script>
   import { onMount, onDestroy } from 'svelte'
-  import { currentScreen, results, connectionStatus } from '../stores/app.js'
+  import { get } from 'svelte/store'
+  import { currentScreen, results, consecutiveFailures } from '../stores/app.js'
   import { supabase } from '../lib/supabase.js'
   import { flushQueue } from '../lib/vote.js'
   import { getQueueCounts, mergeResults, calcPercentages } from '../lib/results.js'
-  import { RESET_TIMER, POLL_INTERVAL } from '../lib/config.js'
+  import { reportSuccess, reportFailure, backoffDelay } from '../lib/connection.js'
+  import { RESET_TIMER } from '../lib/config.js'
   import Header from './Header.svelte'
   import ConnectionIndicator from './ConnectionIndicator.svelte'
 
-  let pollInterval = null
+  let pollTimeout = null
   let resetTimeout = null
   let secondsLeft = $state(RESET_TIMER)
   let animated = $state(false)
@@ -36,11 +38,11 @@
       const counts = { 1: 0, 2: 0, 3: 0, 4: 0 }
       data.forEach(row => { counts[row.option] = Number(row.count) })
       results.set(counts)
-      connectionStatus.set('ok')
+      reportSuccess()
       await flushQueue()
       refreshQueueCounts()
     } catch {
-      connectionStatus.set('error')
+      reportFailure()
       refreshQueueCounts()
     } finally {
       fetching = false
@@ -58,18 +60,36 @@
     }, 1000)
   }
 
+  async function pollLoop() {
+    await fetchResults()
+    const delay = backoffDelay(get(consecutiveFailures))
+    pollTimeout = setTimeout(pollLoop, delay)
+  }
+
+  function onVisibilityChange() {
+    if (document.visibilityState !== 'visible') return
+    clearTimeout(pollTimeout)
+    pollLoop()
+    clearInterval(resetTimeout)
+    startResetCountdown()
+  }
+
   onMount(async () => {
     results.set({ 1: 0, 2: 0, 3: 0, 4: 0 })
     refreshQueueCounts()
     await fetchResults()
-    requestAnimationFrame(() => { animated = true })
+    requestAnimationFrame(() => {
+      animated = true
+    })
     startResetCountdown()
-    pollInterval = setInterval(fetchResults, POLL_INTERVAL)
+    pollTimeout = setTimeout(pollLoop, backoffDelay(get(consecutiveFailures)))
+    document.addEventListener('visibilitychange', onVisibilityChange)
   })
 
   onDestroy(() => {
-    clearInterval(pollInterval)
+    clearTimeout(pollTimeout)
     clearInterval(resetTimeout)
+    document.removeEventListener('visibilitychange', onVisibilityChange)
   })
 </script>
 

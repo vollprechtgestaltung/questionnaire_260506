@@ -6,7 +6,8 @@
   const labels = {
     ok: 'Online',
     error: 'Verbindungsfehler',
-    offline: 'Offline'
+    offline: 'Offline',
+    unreachable: 'Server nicht erreichbar — WLAN prüfen'
   }
 </script>
 
@@ -46,4 +47,10 @@
   [data-status='ok']    .dot { background: #48bb78; }
   [data-status='error'] .dot { background: #e53e3e; }
   [data-status='offline'] .dot { background: #ecc94b; }
+  [data-status='unreachable'] .dot { background: #e53e3e; }
+
+  .indicator[data-status='unreachable'] {
+    opacity: 1;
+    font-weight: 600;
+  }
 </style>
