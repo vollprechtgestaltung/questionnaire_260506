@@ -74,6 +74,16 @@
     startResetCountdown()
   }
 
+  function onOnline() {
+    clearTimeout(pollTimeout)
+    pollLoop()
+  }
+
+  function onOffline() {
+    reportFailure()
+    refreshQueueCounts()
+  }
+
   onMount(async () => {
     results.set({ 1: 0, 2: 0, 3: 0, 4: 0 })
     refreshQueueCounts()
@@ -84,12 +94,16 @@
     startResetCountdown()
     pollTimeout = setTimeout(pollLoop, backoffDelay(get(consecutiveFailures)))
     document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('online', onOnline)
+    window.addEventListener('offline', onOffline)
   })
 
   onDestroy(() => {
     clearTimeout(pollTimeout)
     clearInterval(resetTimeout)
     document.removeEventListener('visibilitychange', onVisibilityChange)
+    window.removeEventListener('online', onOnline)
+    window.removeEventListener('offline', onOffline)
   })
 </script>
 

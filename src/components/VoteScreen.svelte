@@ -20,13 +20,21 @@
     if (document.visibilityState === 'visible') checkConnection()
   }
 
+  function onOffline() {
+    reportFailure()
+  }
+
   onMount(() => {
     checkConnection()
     document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('online', checkConnection)
+    window.addEventListener('offline', onOffline)
   })
 
   onDestroy(() => {
     document.removeEventListener('visibilitychange', onVisibilityChange)
+    window.removeEventListener('online', checkConnection)
+    window.removeEventListener('offline', onOffline)
   })
 
   async function submitVote(optionId) {
