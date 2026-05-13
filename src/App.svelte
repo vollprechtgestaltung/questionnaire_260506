@@ -7,6 +7,11 @@
 
   let wakeLock = null
 
+  function handleError(error) {
+    console.error('App crash:', error)
+    setTimeout(() => window.location.reload(), 3000)
+  }
+
   async function acquireWakeLock() {
     if ('wakeLock' in navigator) {
       try {
@@ -32,12 +37,21 @@
   })
 </script>
 
-{#if $currentScreen === 'vote'}
-  <ConnectionIndicator />
-  <VoteScreen />
-{:else if $currentScreen === 'result'}
-  <ResultScreen />
-{/if}
+<svelte:boundary onerror={handleError}>
+  {#if $currentScreen === 'vote'}
+    <ConnectionIndicator />
+    <VoteScreen />
+  {:else if $currentScreen === 'result'}
+    <ResultScreen />
+  {/if}
+
+  {#snippet failed(error, reset)}
+    <main class="error-screen">
+      <p>Ein Fehler ist aufgetreten.</p>
+      <p>App wird neu geladen…</p>
+    </main>
+  {/snippet}
+</svelte:boundary>
 
 <style>
   :global(*, *::before, *::after) {
@@ -72,5 +86,16 @@
 
   :global(#app) {
     height: 100dvh;
+  }
+
+  .error-screen {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    opacity: 0.5;
   }
 </style>

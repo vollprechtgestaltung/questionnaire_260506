@@ -6,25 +6,26 @@
   import { getQueue } from '../lib/queue.js'
   import { OPTIONS, RESET_TIMER, POLL_INTERVAL } from '../lib/config.js'
   import Header from './Header.svelte'
+  import ConnectionIndicator from './ConnectionIndicator.svelte'
 
   let pollInterval = null
   let resetTimeout = null
-  let secondsLeft = RESET_TIMER
-  let animated = false
+  let secondsLeft = $state(RESET_TIMER)
+  let animated = $state(false)
   let fetching = false
 
-  let queueCounts = {}
+  let queueCounts = $state({})
 
-  $: merged = OPTIONS.reduce((acc, o) => {
+  let merged = $derived(OPTIONS.reduce((acc, o) => {
     acc[o.id] = ($results[o.id] ?? 0) + (queueCounts[o.id] ?? 0)
     return acc
-  }, {})
-  $: total = Object.values(merged).reduce((s, n) => s + n, 0)
-  $: percentages = OPTIONS.map(o => ({
+  }, {}))
+  let total = $derived(Object.values(merged).reduce((s, n) => s + n, 0))
+  let percentages = $derived(OPTIONS.map(o => ({
     ...o,
     count: merged[o.id] ?? 0,
     pct: total > 0 ? Math.round((merged[o.id] ?? 0) / total * 100) : 0
-  }))
+  })))
 
   function refreshQueueCounts() {
     const counts = {}
@@ -103,9 +104,8 @@
   <div class="statusbar">
     <span>{total} Antworten</span>
     <button class="skip" onclick={() => currentScreen.set('vote')}>{secondsLeft}s</button>
-    <span class="connection" data-status={$connectionStatus}>
-      <span class="dot"></span>
-      {#if $connectionStatus === 'ok'}Online{:else if $connectionStatus === 'offline'}Offline{:else}Verbindungsfehler{/if}
+    <span class="connection">
+      <ConnectionIndicator inline={true} />
     </span>
   </div>
 </main>
@@ -191,18 +191,6 @@
 
   .connection {
     display: flex;
-    align-items: center;
     justify-content: flex-end;
-    gap: 0.4rem;
   }
-
-  .connection .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-
-  [data-status='ok'] .dot { background: #48bb78; }
-  [data-status='error'] .dot { background: #e53e3e; }
-  [data-status='offline'] .dot { background: #ecc94b; }
 </style>

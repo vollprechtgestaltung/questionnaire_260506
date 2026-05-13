@@ -1,6 +1,8 @@
 <script>
   import { connectionStatus } from '../stores/app.js'
 
+  const { inline } = $props()
+
   const labels = {
     ok: 'Online',
     error: 'Verbindungsfehler',
@@ -8,24 +10,19 @@
   }
 </script>
 
-<div class="indicator" data-status={$connectionStatus}>
+<span class="indicator" class:fixed={!inline} data-status={$connectionStatus}>
   <span class="dot"></span>
   <span class="label">{labels[$connectionStatus]}</span>
-</div>
+</span>
 
 <style>
   .indicator {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
     display: flex;
     align-items: center;
     gap: 0.4rem;
     font-size: 0.7rem;
     opacity: 0.5;
-    transition: opacity 0.3s;
     pointer-events: none;
-    z-index: 100;
   }
 
   .indicator[data-status='error'],
@@ -33,11 +30,17 @@
     opacity: 1;
   }
 
+  .fixed {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;
+  }
+
   .dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: currentColor;
   }
 
   [data-status='ok']    .dot { background: #48bb78; }

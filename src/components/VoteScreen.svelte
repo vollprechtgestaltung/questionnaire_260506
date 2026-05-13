@@ -6,8 +6,8 @@
   import { QUESTION, OPTIONS } from '../lib/config.js'
   import Header from './Header.svelte'
 
-  let voted = false
-  let submitting = false
+  let voted = $state(false)
+  let submitting = $state(false)
 
   onMount(async () => {
     const ok = await pingSupabase()
