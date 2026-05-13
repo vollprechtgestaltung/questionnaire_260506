@@ -26,8 +26,14 @@ Zwei iPads gleichzeitig → Polling-Intervall leicht versetzt → %-Anzeige kann
 **Fix:** Polling-Intervall auf allen Geräten gleich, Ergebnis nur nach vollständigem Response rendern.
 
 ### Polling bei Verbindungsausfall
-Kein Internet = Polls schlagen fehl. Vote-Button mit einfachem Retry (3 Versuche) absichern.
-Kein Offline-Queue nötig — MiFi als Zuverlässigkeitsschicht.
+Kein Internet = Polls schlagen fehl, letzte bekannte Ergebnisse bleiben sichtbar, Countdown läuft weiter.
+
+### Vote geht verloren bei Netzausfall
+Alle 3 Retries schlagen fehl → Vote nicht in DB.
+**Fix (implementiert):** Offline-Queue in `localStorage` (`src/lib/queue.js`).
+- Vote wird lokal gespeichert, Nutzer landet trotzdem auf dem Ergebnis-Screen
+- Queue wird nach jedem erfolgreichen Poll-Zyklus geleert (Votes nachgeliefert)
+- localStorage überlebt App- und iPad-Neustarts — nur manuelles Löschen der Browser-Daten verliert die Queue
 
 ## Deployment / Setup
 

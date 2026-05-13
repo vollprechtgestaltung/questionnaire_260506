@@ -3,40 +3,15 @@
   import { currentScreen, connectionStatus, deviceId } from '../stores/app.js'
   import { supabase, pingSupabase } from '../lib/supabase.js'
   import { QUESTION, OPTIONS, VOTE_RETRY_ATTEMPTS } from '../lib/config.js'
+  import { saveToQueue } from '../lib/queue.js'
   import Header from './Header.svelte'
 
   let voted = false
-  let error = null
-  let wakeLock = null
-
-  // Wake Lock — keep screen on (iOS 16.4+)
-  async function acquireWakeLock() {
-    if ('wakeLock' in navigator) {
-      try {
-        wakeLock = await navigator.wakeLock.request('screen')
-      } catch {
-        // Wake Lock not available — handled via iPad settings
-      }
-    }
-  }
 
   onMount(async () => {
-    await acquireWakeLock()
-
     // Smoke test on mount
     const ok = await pingSupabase()
     connectionStatus.set(ok ? 'ok' : 'error')
-
-    // Re-acquire Wake Lock if document becomes visible again
-    document.addEventListener('visibilitychange', async () => {
-      if (document.visibilityState === 'visible') {
-        await acquireWakeLock()
-      }
-    })
-
-    return () => {
-      wakeLock?.release()
-    }
   })
 
   async function submitVote(optionId) {
@@ -44,16 +19,14 @@
     voted = true
     error = null
 
+    const vote = { id: crypto.randomUUID(), option: optionId, device_id: deviceId }
+
     let attempt = 0
     while (attempt < VOTE_RETRY_ATTEMPTS) {
       try {
-        const { error: dbError } = await supabase.from('votes').insert({
-          id: crypto.randomUUID(),
-          option: optionId,
-          device_id: deviceId
-        })
+        const { error } = await supabase.from('votes').insert(vote)
 
-        if (!dbError) {
+        if (!error) {
           connectionStatus.set('ok')
           currentScreen.set('result')
           return
@@ -65,10 +38,10 @@
       }
     }
 
-    // All retries failed
+    // All retries failed — queue locally, show results anyway
+    saveToQueue(vote)
     connectionStatus.set('error')
-    error = 'Abstimmung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.'
-    voted = false
+    currentScreen.set('result')
   }
 </script>
 
@@ -90,9 +63,6 @@
     {/each}
   </div>
 
-  {#if error}
-    <p class="error">{error}</p>
-  {/if}
 </main>
 
 <style>
@@ -150,9 +120,4 @@
     cursor: not-allowed;
   }
 
-  .error {
-    color: #e53e3e;
-    text-align: center;
-    font-size: 1rem;
-  }
 </style>

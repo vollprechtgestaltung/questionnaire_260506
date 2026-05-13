@@ -3,6 +3,7 @@
   import { currentScreen, results, connectionStatus } from '../stores/app.js'
   import { supabase } from '../lib/supabase.js'
   import { OPTIONS, RESET_TIMER, POLL_INTERVAL } from '../lib/config.js'
+  import { getQueue, removeFromQueue } from '../lib/queue.js'
   import Header from './Header.svelte'
 
   let pollInterval = null
@@ -17,18 +18,29 @@
     pct: total > 0 ? Math.round(($results[o.id] ?? 0) / total * 100) : 0
   }))
 
+  async function flushQueue() {
+    const queue = getQueue()
+    for (const vote of queue) {
+      try {
+        const { error } = await supabase.from('votes').insert(vote)
+        if (!error) removeFromQueue(vote.id)
+      } catch {
+        // Will retry on next poll cycle
+      }
+    }
+  }
+
   async function fetchResults() {
     try {
-      const { data, error } = await supabase
-        .from('votes')
-        .select('option')
+      const { data, error } = await supabase.rpc('get_vote_counts')
 
       if (error) throw error
 
       const counts = { 1: 0, 2: 0, 3: 0, 4: 0 }
-      data.forEach(row => { counts[row.option] = (counts[row.option] ?? 0) + 1 })
+      data.forEach(row => { counts[row.option] = Number(row.count) })
       results.set(counts)
       connectionStatus.set('ok')
+      flushQueue()
     } catch {
       connectionStatus.set('error')
     }

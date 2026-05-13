@@ -47,3 +47,26 @@ Beim lokalen Testen VPN deaktivieren — Supabase-Requests werden sonst geblockt
 ### Vercel: Env Vars vor erstem Deploy setzen
 Umgebungsvariablen (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) müssen in Vercel
 gesetzt sein, bevor der erste Deploy ausgeführt wird. Nur Production-Vars nötig.
+
+---
+
+## Offline-Verhalten / Queue
+
+### Optimistische UX statt Fehlermeldung
+Bei Netzausfall sieht der Nutzer keine Fehlermeldung — der Vote wird lokal gespeichert
+und er landet trotzdem auf dem Ergebnis-Screen. Niemand auf einer Messe unterscheidet
+zwischen «App kaputt» und «Netzwerk ausgefallen».
+
+### localStorage als Offline-Queue
+`src/lib/queue.js` speichert fehlgeschlagene Votes in `localStorage`.
+Queue wird in `ResultScreen` nach jedem erfolgreichen Supabase-Request geleert.
+localStorage überlebt App-Neustarts und iPad-Reboots — Votes werden zuverlässig nachgeliefert.
+
+### Vote-ID vor Retry-Loop generieren
+`crypto.randomUUID()` muss einmalig vor der Retry-Schleife aufgerufen werden.
+Wird die ID innerhalb der Schleife generiert, entstehen bei mehreren Versuchen
+verschiedene IDs für denselben Vote — potenzielle Duplikate in der DB.
+
+### Supabase RPC für Aggregation
+`supabase.rpc('get_vote_counts')` statt `select('option')` — gibt nur 4 Zeilen zurück,
+egal wie viele Votes existieren. Postgres-Funktion muss mit `GRANT EXECUTE ON FUNCTION ... TO anon` freigegeben werden.

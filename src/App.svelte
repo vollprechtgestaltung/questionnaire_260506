@@ -1,8 +1,35 @@
 <script>
+  import { onMount } from 'svelte'
   import { currentScreen } from './stores/app.js'
   import VoteScreen from './components/VoteScreen.svelte'
   import ResultScreen from './components/ResultScreen.svelte'
   import ConnectionIndicator from './components/ConnectionIndicator.svelte'
+
+  let wakeLock = null
+
+  async function acquireWakeLock() {
+    if ('wakeLock' in navigator) {
+      try {
+        wakeLock = await navigator.wakeLock.request('screen')
+      } catch {
+        // Wake Lock not available — handled via iPad settings
+      }
+    }
+  }
+
+  onMount(() => {
+    acquireWakeLock()
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') acquireWakeLock()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      wakeLock?.release()
+    }
+  })
 </script>
 
 <ConnectionIndicator />

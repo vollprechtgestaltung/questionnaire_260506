@@ -34,13 +34,14 @@ Status-Legende: ⬜ offen · 🔄 in Arbeit · ✅ erledigt
 - Frage + 4 Buttons
 - Button nach Tap sofort deaktivieren (kein Double-Vote)
 - Vote an Supabase senden mit Retry-Logik (3 Versuche)
-- Bei Fehler nach 3 Versuchen: Fehlermeldung für Besucher
-- Wake Lock API aktivieren (iOS 16.4+)
+- Bei Fehler nach 3 Versuchen: Vote in localStorage-Queue, trotzdem weiter zu Ergebnis-Screen
+- Wake Lock API aktivieren (iOS 16.4+) — verwaltet in App.svelte (überlebt Screen-Wechsel)
 
 ## Schritt 6 — Ergebnis-Screen ✅
-- Polling alle 2–3s: Stimmen aus Supabase lesen
+- Polling alle 2–3s: Stimmen via RPC `get_vote_counts()` aggregiert aus Supabase lesen
 - CSS-animiertes Balkendiagramm mit %-Anzeige
-- 60s Reset-Timer startet nach vollständiger Anzeige
+- Nach jedem erfolgreichen Poll: localStorage-Queue leeren (Votes nachliefern)
+- 20s Reset-Timer startet nach vollständiger Anzeige
 - Nach Reset: zurück zu Vote-Screen, Buttons wieder aktiv
 
 ## Schritt 7 — Verbindungsindikator ✅
@@ -64,9 +65,9 @@ Basierend auf `docs/pitfalls.md`:
 - **Auto-Reset Timing:** Sicherstellen, dass Timer erst nach vollständiger Ergebnis-Anzeige startet
 - **Display-Sleep:** Prüfen, ob Wake Lock greift — iPad-Einstellung "Auto-Lock → Nie" dokumentieren
 - **Simultane Votes:** Zwei Geräte gleichzeitig abstimmen — %-Anzeige darf nicht flackern
-- **Verbindungsausfall:** WLAN trennen während Abstimmung — Retry greift, Fehlermeldung erscheint
+- **Verbindungsausfall:** WLAN trennen während Abstimmung — Vote landet in localStorage-Queue, App wechselt trotzdem zu Ergebnis-Screen, Vote wird nachgeliefert sobald Verbindung zurück
 - **MiFi-Checklist:** Vor Messe: MiFi geladen, SIM aktiv, alle iPads verbunden
 
 ---
 
-_Letzte Aktualisierung: 2026-05-06_
+_Letzte Aktualisierung: 2026-05-13_
