@@ -17,7 +17,6 @@
   async function submitVote(optionId) {
     if (voted) return
     voted = true
-    error = null
 
     const vote = { id: crypto.randomUUID(), option: optionId, device_id: deviceId }
 
