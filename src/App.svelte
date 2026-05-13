@@ -37,9 +37,11 @@
       if (document.visibilityState === 'visible') acquireWakeLock()
     }
     document.addEventListener('visibilitychange', onVisibilityChange)
+    window.addEventListener('focus', acquireWakeLock)
 
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange)
+      window.removeEventListener('focus', acquireWakeLock)
       wakeLock?.release()
     }
   })
