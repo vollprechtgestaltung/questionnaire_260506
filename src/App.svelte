@@ -50,6 +50,7 @@
     <ConnectionIndicator />
     <VoteScreen />
   {:else if $currentScreen === 'result'}
+    <ConnectionIndicator showTimestamp={true} />
     <ResultScreen />
   {/if}
 

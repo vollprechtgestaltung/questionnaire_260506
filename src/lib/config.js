@@ -5,6 +5,7 @@ export const POLL_INTERVAL_MAX = 30000 // ms — cap for exponential backoff
 export const VOTE_RETRY_ATTEMPTS = 3 // retries before queuing locally
 export const VOTE_RETRY_TIMEOUT = 4000 // ms timeout per retry attempt
 export const UNREACHABLE_THRESHOLD = 5 // consecutive failures before showing captive portal warning
+export const QUEUE_MAX_SIZE = 500 // max votes kept in localStorage queue; oldest dropped beyond
 
 // Question content
 export const QUESTION = 'Was verändert diese Erfahrung für Sie?'

@@ -1,23 +1,48 @@
 <script>
-  import { connectionStatus } from '../stores/app.js'
+  import { onMount, onDestroy } from 'svelte'
+  import { connectionStatus, lastFetchAt } from '../stores/app.js'
+  import { formatAge } from '../lib/connection.js'
 
-  const { inline } = $props()
+  const { showTimestamp = false } = $props()
 
-  const labels = {
+  let now = $state(Date.now())
+  let tick = null
+
+  const staticLabels = {
     ok: 'Online',
     error: 'Verbindungsfehler',
     offline: 'Offline',
     unreachable: 'Server nicht erreichbar — WLAN prüfen'
   }
+
+  let label = $derived.by(() => {
+    if (showTimestamp && $connectionStatus === 'ok' && $lastFetchAt) {
+      const age = formatAge($lastFetchAt, now)
+      return age === 'soeben' ? staticLabels.ok : age
+    }
+    return staticLabels[$connectionStatus]
+  })
+
+  onMount(() => {
+    if (showTimestamp) tick = setInterval(() => (now = Date.now()), 1000)
+  })
+
+  onDestroy(() => {
+    if (tick) clearInterval(tick)
+  })
 </script>
 
-<span class="indicator" class:fixed={!inline} data-status={$connectionStatus}>
+<span class="indicator" data-status={$connectionStatus}>
   <span class="dot"></span>
-  <span class="label">{labels[$connectionStatus]}</span>
+  <span class="label">{label}</span>
 </span>
 
 <style>
   .indicator {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -31,23 +56,24 @@
     opacity: 1;
   }
 
-  .fixed {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    z-index: 100;
-  }
-
   .dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
   }
 
-  [data-status='ok']    .dot { background: #48bb78; }
-  [data-status='error'] .dot { background: #e53e3e; }
-  [data-status='offline'] .dot { background: #ecc94b; }
-  [data-status='unreachable'] .dot { background: #e53e3e; }
+  [data-status='ok'] .dot {
+    background: #48bb78;
+  }
+  [data-status='error'] .dot {
+    background: #e53e3e;
+  }
+  [data-status='offline'] .dot {
+    background: #ecc94b;
+  }
+  [data-status='unreachable'] .dot {
+    background: #e53e3e;
+  }
 
   .indicator[data-status='unreachable'] {
     opacity: 1;

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { saveToQueue, getQueue, removeFromQueue } from './queue.js'
+import { QUEUE_MAX_SIZE } from './config.js'
 
 const QUEUE_KEY = 'puls_vote_queue'
 
@@ -59,5 +60,47 @@ describe('queue', () => {
   it('handles corrupted localStorage gracefully', () => {
     storageMap[QUEUE_KEY] = 'not-json!!!'
     expect(getQueue()).toEqual([])
+  })
+
+  it('caps the queue at QUEUE_MAX_SIZE, dropping oldest entries', () => {
+    for (let i = 0; i < QUEUE_MAX_SIZE + 10; i++) {
+      saveToQueue({ id: `v${i}`, option: 1, device_id: 'd' })
+    }
+    const queue = getQueue()
+    expect(queue.length).toBe(QUEUE_MAX_SIZE)
+    // Oldest 10 should be dropped; newest entry should be the last one we added
+    expect(queue[0].id).toBe('v10')
+    expect(queue[queue.length - 1].id).toBe(`v${QUEUE_MAX_SIZE + 9}`)
+  })
+
+  it('handles quota exceeded by trimming the queue and retrying', () => {
+    let throwOnce = true
+    localStorageMock.setItem.mockImplementation((key, value) => {
+      if (throwOnce) {
+        throwOnce = false
+        const err = new Error('QuotaExceededError')
+        err.name = 'QuotaExceededError'
+        throw err
+      }
+      storageMap[key] = value
+    })
+
+    // Pre-populate queue near limit
+    for (let i = 0; i < QUEUE_MAX_SIZE; i++) {
+      storageMap[QUEUE_KEY] = JSON.stringify(
+        (storageMap[QUEUE_KEY] ? JSON.parse(storageMap[QUEUE_KEY]) : []).concat({
+          id: `pre${i}`,
+          option: 1,
+          device_id: 'd'
+        })
+      )
+    }
+
+    saveToQueue({ id: 'new', option: 2, device_id: 'd' })
+    const queue = getQueue()
+    // Should be trimmed to half the max
+    expect(queue.length).toBeLessThanOrEqual(Math.floor(QUEUE_MAX_SIZE / 2))
+    // Newest entry should still be there
+    expect(queue.some((v) => v.id === 'new')).toBe(true)
   })
 })

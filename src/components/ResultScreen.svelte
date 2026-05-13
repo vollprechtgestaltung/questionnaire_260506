@@ -8,7 +8,6 @@
   import { reportSuccess, reportFailure, backoffDelay } from '../lib/connection.js'
   import { RESET_TIMER } from '../lib/config.js'
   import Header from './Header.svelte'
-  import ConnectionIndicator from './ConnectionIndicator.svelte'
 
   let pollTimeout = null
   let resetTimeout = null
@@ -128,9 +127,7 @@
   <div class="statusbar">
     <span>{total} Antworten</span>
     <button class="skip" onclick={() => currentScreen.set('vote')}>{secondsLeft}s</button>
-    <span class="connection">
-      <ConnectionIndicator inline={true} />
-    </span>
+    <span></span>
   </div>
 </main>
 
@@ -213,8 +210,4 @@
     opacity: 0.4;
   }
 
-  .connection {
-    display: flex;
-    justify-content: flex-end;
-  }
 </style>

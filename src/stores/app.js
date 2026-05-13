@@ -15,6 +15,10 @@ export const consecutiveFailures = writable(0)
 // True when a new service worker is waiting; app should reload at next idle moment
 export const updateAvailable = writable(false)
 
+// Unix timestamp (ms) of the last successful Supabase response. Used to display
+// "vor Xs" on the result screen.
+export const lastFetchAt = writable(null)
+
 // Persistent device ID — generated once, stored in localStorage
 function getDeviceId() {
   const key = 'puls_device_id'
