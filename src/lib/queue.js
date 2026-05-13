@@ -15,6 +15,6 @@ export function getQueue() {
 }
 
 export function removeFromQueue(id) {
-  const queue = getQueue().filter(v => v.id !== id)
+  const queue = getQueue().filter((v) => v.id !== id)
   localStorage.setItem(QUEUE_KEY, JSON.stringify(queue))
 }

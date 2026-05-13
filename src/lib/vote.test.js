@@ -4,8 +4,10 @@ import { withTimeout } from './vote.js'
 // --- localStorage mock ---
 const storageMap = {}
 vi.stubGlobal('localStorage', {
-  getItem: vi.fn(key => storageMap[key] ?? null),
-  setItem: vi.fn((key, value) => { storageMap[key] = value }),
+  getItem: vi.fn((key) => storageMap[key] ?? null),
+  setItem: vi.fn((key, value) => {
+    storageMap[key] = value
+  })
 })
 
 function clearStorage() {
@@ -33,7 +35,7 @@ describe('withTimeout', () => {
   })
 
   it('rejects if promise is slower than timeout', async () => {
-    const slow = new Promise(resolve => setTimeout(() => resolve('late'), 500))
+    const slow = new Promise((resolve) => setTimeout(() => resolve('late'), 500))
     await expect(withTimeout(slow, 50)).rejects.toThrow('timeout')
   })
 })

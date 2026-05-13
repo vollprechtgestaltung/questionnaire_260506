@@ -41,7 +41,7 @@
     </div>
   {:else}
     <div class="options">
-      {#each OPTIONS as option}
+      {#each OPTIONS as option (option.id)}
         <button
           disabled={voted}
           onclick={() => submitVote(option.id)}

@@ -21,10 +21,7 @@ export async function submitVote(vote) {
   let attempt = 0
   while (attempt < VOTE_RETRY_ATTEMPTS) {
     try {
-      const { error } = await withTimeout(
-        supabase.from('votes').insert(vote),
-        VOTE_RETRY_TIMEOUT
-      )
+      const { error } = await withTimeout(supabase.from('votes').insert(vote), VOTE_RETRY_TIMEOUT)
 
       if (!error) return { status: 'ok' }
 

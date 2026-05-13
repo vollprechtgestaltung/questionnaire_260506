@@ -3,8 +3,8 @@
   import { currentScreen, results, connectionStatus } from '../stores/app.js'
   import { supabase } from '../lib/supabase.js'
   import { flushQueue } from '../lib/vote.js'
-  import { getQueue } from '../lib/queue.js'
-  import { OPTIONS, RESET_TIMER, POLL_INTERVAL } from '../lib/config.js'
+  import { getQueueCounts, mergeResults, calcPercentages } from '../lib/results.js'
+  import { RESET_TIMER, POLL_INTERVAL } from '../lib/config.js'
   import Header from './Header.svelte'
   import ConnectionIndicator from './ConnectionIndicator.svelte'
 
@@ -16,23 +16,13 @@
 
   let queueCounts = $state({})
 
-  let merged = $derived(OPTIONS.reduce((acc, o) => {
-    acc[o.id] = ($results[o.id] ?? 0) + (queueCounts[o.id] ?? 0)
-    return acc
-  }, {}))
-  let total = $derived(Object.values(merged).reduce((s, n) => s + n, 0))
-  let percentages = $derived(OPTIONS.map(o => ({
-    ...o,
-    count: merged[o.id] ?? 0,
-    pct: total > 0 ? Math.round((merged[o.id] ?? 0) / total * 100) : 0
-  })))
+  let merged = $derived(mergeResults($results, queueCounts))
+  let computed = $derived(calcPercentages(merged))
+  let total = $derived(computed.total)
+  let percentages = $derived(computed.percentages)
 
   function refreshQueueCounts() {
-    const counts = {}
-    for (const vote of getQueue()) {
-      counts[vote.option] = (counts[vote.option] ?? 0) + 1
-    }
-    queueCounts = counts
+    queueCounts = getQueueCounts()
   }
 
   async function fetchResults() {
@@ -87,7 +77,7 @@
   <Header />
   <div class="content">
   <div class="bars">
-    {#each percentages as option}
+    {#each percentages as option (option.id)}
       <div class="row">
         <div class="row-header">
           <span class="label">{option.label}</span>

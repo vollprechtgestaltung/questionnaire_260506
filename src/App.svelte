@@ -45,7 +45,7 @@
     <ResultScreen />
   {/if}
 
-  {#snippet failed(error, reset)}
+  {#snippet failed(_error, _reset)}
     <main class="error-screen">
       <p>Ein Fehler ist aufgetreten.</p>
       <p>App wird neu geladen…</p>

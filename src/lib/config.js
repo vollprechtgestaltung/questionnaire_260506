@@ -1,6 +1,6 @@
 // Timing
-export const RESET_TIMER = 20        // seconds until auto-reset to vote screen
-export const POLL_INTERVAL = 2500    // ms between result polls
+export const RESET_TIMER = 20 // seconds until auto-reset to vote screen
+export const POLL_INTERVAL = 2500 // ms between result polls
 export const VOTE_RETRY_ATTEMPTS = 3 // retries before queuing locally
 export const VOTE_RETRY_TIMEOUT = 4000 // ms timeout per retry attempt
 

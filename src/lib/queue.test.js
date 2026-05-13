@@ -5,8 +5,10 @@ const QUEUE_KEY = 'puls_vote_queue'
 
 const storageMap = {}
 const localStorageMock = {
-  getItem: vi.fn(key => storageMap[key] ?? null),
-  setItem: vi.fn((key, value) => { storageMap[key] = value }),
+  getItem: vi.fn((key) => storageMap[key] ?? null),
+  setItem: vi.fn((key, value) => {
+    storageMap[key] = value
+  })
 }
 
 vi.stubGlobal('localStorage', localStorageMock)
