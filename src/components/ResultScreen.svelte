@@ -120,7 +120,15 @@
           <span class="pct">{option.pct}%</span>
         </div>
         <div class="track">
-          <div class="bar" style="width: {animated ? option.pct : 0}%"></div>
+          <div
+            class="bar"
+            role="progressbar"
+            aria-valuenow={option.pct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="{option.label}: {option.pct}%"
+            style="width: {animated ? option.pct : 0}%"
+          ></div>
         </div>
       </div>
     {/each}
@@ -129,7 +137,7 @@
   </div>
   <div class="statusbar">
     <span>{total} Antworten</span>
-    <button class="skip" onclick={() => currentScreen.set('vote')}>{secondsLeft}s</button>
+    <button class="skip" onclick={() => currentScreen.set('vote')} aria-label="Zurück zur Abstimmung">{secondsLeft}s</button>
     <span></span>
   </div>
 </main>

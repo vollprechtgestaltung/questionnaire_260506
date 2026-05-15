@@ -60,8 +60,8 @@
   </div>
 
   {#if submitting}
-    <div class="loader-overlay">
-      <div class="spinner"></div>
+    <div class="loader-overlay" role="status" aria-label="Antwort wird gespeichert">
+      <div class="spinner" aria-hidden="true"></div>
     </div>
   {:else}
     <div class="options">
