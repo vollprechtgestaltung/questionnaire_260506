@@ -12,19 +12,17 @@ CREATE TABLE IF NOT EXISTS votes (
 -- 2. Row Level Security
 ALTER TABLE votes ENABLE ROW LEVEL SECURITY;
 
--- Allow anyone to insert (anonymous vote)
-CREATE POLICY "allow insert" ON votes
-  FOR INSERT WITH CHECK (true);
+-- Inserts go through the submit-vote Edge Function (service role).
+-- Direct inserts from anon are intentionally blocked.
 
 -- Allow anyone to read (for result polling)
 CREATE POLICY "allow select" ON votes
   FOR SELECT USING (true);
 
--- No UPDATE or DELETE policies — not needed, not allowed
+-- No INSERT, UPDATE or DELETE policies for anon
 
--- 3. Grant basic table privileges to the anon role
--- RLS alone is not enough — Postgres also requires table-level GRANTs
-GRANT SELECT, INSERT ON votes TO anon;
+-- 3. Grant read-only privileges to the anon role
+GRANT SELECT ON votes TO anon;
 
 -- 4. Aggregation function — returns vote counts per option
 -- Avoids fetching all rows on the client; only totals are transferred

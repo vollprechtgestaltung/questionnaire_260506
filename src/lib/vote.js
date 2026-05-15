@@ -1,8 +1,17 @@
-import { supabase } from './supabase.js'
 import { saveToQueue, getQueue, removeFromQueue } from './queue.js'
-import { VOTE_RETRY_ATTEMPTS, VOTE_RETRY_TIMEOUT } from './config.js'
+import { VOTE_RETRY_ATTEMPTS, VOTE_RETRY_TIMEOUT, SUBMIT_VOTE_URL } from './config.js'
 export { withAbortableTimeout } from './timeout.js'
 import { withAbortableTimeout } from './timeout.js'
+
+async function postVote(vote, signal) {
+  const res = await fetch(SUBMIT_VOTE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(vote),
+    signal,
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+}
 
 export async function submitVote(vote) {
   if (!navigator.onLine) {
@@ -13,14 +22,8 @@ export async function submitVote(vote) {
   let attempt = 0
   while (attempt < VOTE_RETRY_ATTEMPTS) {
     try {
-      const { error } = await withAbortableTimeout(
-        (signal) => supabase.from('votes').insert(vote).abortSignal(signal),
-        VOTE_RETRY_TIMEOUT
-      )
-
-      if (!error) return { status: 'ok' }
-
-      attempt++
+      await withAbortableTimeout((signal) => postVote(vote, signal), VOTE_RETRY_TIMEOUT)
+      return { status: 'ok' }
     } catch {
       attempt++
     }
@@ -34,11 +37,17 @@ export async function flushQueue() {
   const queue = getQueue()
   for (const vote of queue) {
     try {
-      const { error } = await withAbortableTimeout(
-        (signal) => supabase.from('votes').insert(vote).abortSignal(signal),
+      const res = await withAbortableTimeout(
+        (signal) =>
+          fetch(SUBMIT_VOTE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(vote),
+            signal,
+          }),
         VOTE_RETRY_TIMEOUT
       )
-      if (!error || error.code === '23505') removeFromQueue(vote.id)
+      if (res.ok) removeFromQueue(vote.id)
     } catch {
       // Will retry on next poll cycle
     }

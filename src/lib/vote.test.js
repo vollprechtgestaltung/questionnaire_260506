@@ -14,29 +14,21 @@ function clearStorage() {
   for (const key of Object.keys(storageMap)) delete storageMap[key]
 }
 
-// --- supabase mock ---
-// supabase.from('votes').insert(vote).abortSignal(signal) returns a Promise.
-// Capture the last passed signal so tests can assert abort behaviour.
-const insertMock = vi.fn()
+// --- fetch mock ---
+const fetchMock = vi.fn()
 let lastSignal = null
-vi.mock('./supabase.js', () => ({
-  supabase: {
-    from: () => ({
-      insert: (vote) => ({
-        abortSignal: (signal) => {
-          lastSignal = signal
-          return insertMock(vote)
-        }
-      })
-    })
-  }
-}))
+vi.stubGlobal('fetch', (url, options) => {
+  lastSignal = options?.signal ?? null
+  return fetchMock(url, options)
+})
 
 // Re-import after mocks are set up
 const { submitVote, flushQueue } = await import('./vote.js')
 const { getQueue, saveToQueue } = await import('./queue.js')
 
 const vote = () => ({ id: 'test-uuid', option: 1, device_id: 'dev-1' })
+const okResponse = () => new Response(JSON.stringify({ ok: true }), { status: 200 })
+const errResponse = () => new Response(JSON.stringify({ error: 'fail' }), { status: 500 })
 
 describe('withAbortableTimeout', () => {
   it('resolves when the request finishes before the timeout', async () => {
@@ -69,12 +61,13 @@ describe('withAbortableTimeout', () => {
 describe('submitVote', () => {
   beforeEach(() => {
     clearStorage()
-    insertMock.mockReset()
+    fetchMock.mockReset()
+    lastSignal = null
     vi.stubGlobal('navigator', { onLine: true })
   })
 
   it('returns ok when insert succeeds', async () => {
-    insertMock.mockResolvedValue({ error: null })
+    fetchMock.mockResolvedValue(okResponse())
     const result = await submitVote(vote())
     expect(result).toEqual({ status: 'ok' })
     expect(getQueue()).toEqual([])
@@ -86,40 +79,39 @@ describe('submitVote', () => {
     const result = await submitVote(v)
     expect(result).toEqual({ status: 'queued', reason: 'offline' })
     expect(getQueue()).toEqual([v])
-    expect(insertMock).not.toHaveBeenCalled()
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 
   it('retries on error and succeeds on second attempt', async () => {
-    insertMock
-      .mockResolvedValueOnce({ error: { message: 'fail' } })
-      .mockResolvedValueOnce({ error: null })
+    fetchMock
+      .mockResolvedValueOnce(errResponse())
+      .mockResolvedValueOnce(okResponse())
 
     const result = await submitVote(vote())
     expect(result).toEqual({ status: 'ok' })
-    expect(insertMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(getQueue()).toEqual([])
   })
 
   it('queues vote after all retries fail', async () => {
-    insertMock.mockResolvedValue({ error: { message: 'fail' } })
+    fetchMock.mockResolvedValue(errResponse())
     const v = vote()
     const result = await submitVote(v)
     expect(result).toEqual({ status: 'queued', reason: 'retries_exhausted' })
-    expect(insertMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(getQueue()).toEqual([v])
   })
 
-  it('queues vote when insert throws', async () => {
-    insertMock.mockRejectedValue(new Error('network error'))
+  it('queues vote when fetch throws', async () => {
+    fetchMock.mockRejectedValue(new Error('network error'))
     const v = vote()
     const result = await submitVote(v)
     expect(result).toEqual({ status: 'queued', reason: 'retries_exhausted' })
     expect(getQueue()).toEqual([v])
   })
 
-  it('queues vote when insert times out', async () => {
-    // Simulate Supabase honouring the abort signal
-    insertMock.mockImplementation(
+  it('queues vote when fetch times out', async () => {
+    fetchMock.mockImplementation(
       () =>
         new Promise((_, reject) => {
           lastSignal?.addEventListener('abort', () => reject(new Error('aborted')))
@@ -135,7 +127,7 @@ describe('submitVote', () => {
 describe('flushQueue', () => {
   beforeEach(() => {
     clearStorage()
-    insertMock.mockReset()
+    fetchMock.mockReset()
   })
 
   it('flushes all votes from queue on success', async () => {
@@ -143,35 +135,35 @@ describe('flushQueue', () => {
     const v2 = { id: '2', option: 2, device_id: 'd' }
     saveToQueue(v1)
     saveToQueue(v2)
-    insertMock.mockResolvedValue({ error: null })
+    fetchMock.mockResolvedValue(okResponse())
 
     await flushQueue()
     expect(getQueue()).toEqual([])
-    expect(insertMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
-  it('removes vote on UNIQUE violation (23505)', async () => {
+  it('removes vote when edge function returns ok (includes duplicate)', async () => {
     const v = { id: 'dup', option: 1, device_id: 'd' }
     saveToQueue(v)
-    insertMock.mockResolvedValue({ error: { code: '23505', message: 'duplicate' } })
+    fetchMock.mockResolvedValue(okResponse())
 
     await flushQueue()
     expect(getQueue()).toEqual([])
   })
 
-  it('keeps vote in queue on other errors', async () => {
+  it('keeps vote in queue on error response', async () => {
     const v = { id: 'err', option: 1, device_id: 'd' }
     saveToQueue(v)
-    insertMock.mockResolvedValue({ error: { code: '42000', message: 'other' } })
+    fetchMock.mockResolvedValue(errResponse())
 
     await flushQueue()
     expect(getQueue()).toEqual([v])
   })
 
-  it('keeps vote in queue when insert throws', async () => {
+  it('keeps vote in queue when fetch throws', async () => {
     const v = { id: 'throw', option: 1, device_id: 'd' }
     saveToQueue(v)
-    insertMock.mockRejectedValue(new Error('network'))
+    fetchMock.mockRejectedValue(new Error('network'))
 
     await flushQueue()
     expect(getQueue()).toEqual([v])
@@ -179,6 +171,6 @@ describe('flushQueue', () => {
 
   it('does nothing on empty queue', async () => {
     await flushQueue()
-    expect(insertMock).not.toHaveBeenCalled()
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })
