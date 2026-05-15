@@ -56,11 +56,29 @@ IP-Adresse wird im Terminal angezeigt. iPad muss im gleichen WLAN sein.
 3. Umgebungsvariablen in Vercel setzen:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_SUBMIT_VOTE_URL`
    - `CRON_SECRET` (optional, schützt Heartbeat-Endpoint)
 4. Deploy — Build-Command: `npm run build`, Output: `dist/`
 
 Der Vercel-Cron in `vercel.json` hält das Supabase-Projekt im Free-Tier
 aktiv (siehe `docs/heartbeat.md`).
+
+---
+
+## Edge Function (Supabase)
+
+Vote-Inserts laufen über die Edge Function `submit-vote` — nicht direkt via REST API.
+Die Funktion validiert Input, erzwingt Rate Limiting und nutzt den Service Role Key serverseitig.
+
+**CORS:** Die Edge Function akzeptiert Requests nur von der konfigurierten Domain.  
+Bei Domain-Änderung muss `ALLOWED_ORIGIN` in `supabase/functions/submit-vote/index.ts:4` angepasst
+und die Funktion neu deployed werden:
+
+```bash
+supabase functions deploy submit-vote --project-ref zgqxmooimqhugszgreki
+```
+
+Aktuelle Domain: `https://questionnaire-260506.vercel.app`
 
 ---
 

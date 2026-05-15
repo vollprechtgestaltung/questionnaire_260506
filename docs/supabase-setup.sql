@@ -14,6 +14,9 @@ ALTER TABLE votes ENABLE ROW LEVEL SECURITY;
 
 -- Inserts go through the submit-vote Edge Function (service role).
 -- Direct inserts from anon are intentionally blocked.
+-- Edge Function source: supabase/functions/submit-vote/index.ts
+-- CORS origin is hardcoded in index.ts:4 (ALLOWED_ORIGIN).
+-- On domain change: update ALLOWED_ORIGIN and redeploy the function.
 
 -- Allow anyone to read (for result polling)
 CREATE POLICY "allow select" ON votes
