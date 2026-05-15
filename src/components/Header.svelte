@@ -1,13 +1,13 @@
 <script>
   let dark = $state(localStorage.getItem('puls_theme') === 'dark')
 
-  if (dark) document.documentElement.dataset.theme = 'dark'
+  $effect(() => {
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+  })
 
   function toggle() {
     dark = !dark
-    const theme = dark ? 'dark' : 'light'
-    document.documentElement.dataset.theme = theme
-    localStorage.setItem('puls_theme', theme)
+    localStorage.setItem('puls_theme', dark ? 'dark' : 'light')
   }
 </script>
 

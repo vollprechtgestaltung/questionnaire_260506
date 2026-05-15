@@ -1,6 +1,10 @@
 // Vote submission endpoint (Edge Function — no secret, safe to expose)
 export const SUBMIT_VOTE_URL = import.meta.env.VITE_SUBMIT_VOTE_URL
 
+if (!SUBMIT_VOTE_URL) {
+  throw new Error('Missing VITE_SUBMIT_VOTE_URL. Check .env file.')
+}
+
 // Timing
 export const RESET_TIMER = 20 // seconds until auto-reset to vote screen
 export const POLL_INTERVAL = 2500 // ms between result polls (on success)

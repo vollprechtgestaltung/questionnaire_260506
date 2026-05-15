@@ -5,6 +5,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   test: {
     environment: 'node',
+    env: {
+      VITE_SUBMIT_VOTE_URL: 'https://test.example.com/functions/v1/submit-vote',
+    },
   },
   plugins: [
     svelte(),

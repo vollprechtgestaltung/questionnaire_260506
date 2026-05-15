@@ -18,7 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export async function pingSupabase() {
   try {
     const { error } = await withAbortableTimeout(
-      (signal) => supabase.from('votes').select('id').limit(1).abortSignal(signal),
+      (signal) => supabase.from('votes').select('id', { head: true }).abortSignal(signal),
       VOTE_RETRY_TIMEOUT
     )
     return !error
