@@ -33,6 +33,7 @@ CREATE OR REPLACE FUNCTION get_vote_counts()
 RETURNS TABLE(option smallint, count bigint)
 LANGUAGE sql
 SECURITY DEFINER
+SET search_path = public
 AS $$
   SELECT option, COUNT(*) AS count
   FROM votes
