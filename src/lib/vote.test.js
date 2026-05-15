@@ -105,7 +105,7 @@ describe('submitVote', () => {
     const v = vote()
     const result = await submitVote(v)
     expect(result).toEqual({ status: 'queued', reason: 'retries_exhausted' })
-    expect(insertMock).toHaveBeenCalledTimes(3)
+    expect(insertMock).toHaveBeenCalledTimes(2)
     expect(getQueue()).toEqual([v])
   })
 

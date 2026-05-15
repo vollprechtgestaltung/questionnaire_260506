@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { withAbortableTimeout } from './connection.js'
+import { withAbortableTimeout } from './timeout.js'
 import { VOTE_RETRY_TIMEOUT } from './config.js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL

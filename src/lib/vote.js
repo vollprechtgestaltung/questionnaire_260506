@@ -1,7 +1,8 @@
 import { supabase } from './supabase.js'
 import { saveToQueue, getQueue, removeFromQueue } from './queue.js'
 import { VOTE_RETRY_ATTEMPTS, VOTE_RETRY_TIMEOUT } from './config.js'
-import { withAbortableTimeout } from './connection.js'
+export { withAbortableTimeout } from './timeout.js'
+import { withAbortableTimeout } from './timeout.js'
 
 export async function submitVote(vote) {
   if (!navigator.onLine) {
