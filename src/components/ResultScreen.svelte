@@ -38,6 +38,7 @@
       )
 
       if (error) throw error
+      if (!Array.isArray(data)) throw new Error('unexpected RPC response')
 
       const counts = { 1: 0, 2: 0, 3: 0, 4: 0 }
       data.forEach(row => { counts[row.option] = Number(row.count) })
