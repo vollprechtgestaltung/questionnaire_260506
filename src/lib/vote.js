@@ -1,6 +1,5 @@
 import { saveToQueue, getQueue, removeFromQueue } from './queue.js'
 import { VOTE_RETRY_ATTEMPTS, VOTE_RETRY_TIMEOUT, SUBMIT_VOTE_URL } from './config.js'
-export { withAbortableTimeout } from './timeout.js'
 import { withAbortableTimeout } from './timeout.js'
 
 async function postVote(vote, signal) {
