@@ -7,7 +7,8 @@
   import { getQueueCounts, mergeResults, calcPercentages } from '../lib/results.js'
   import { reportSuccess, reportFailure, backoffDelay } from '../lib/connection.js'
   import { saveCachedResults } from '../lib/cache.js'
-  import { RESET_TIMER } from '../lib/config.js'
+  import { withAbortableTimeout } from '../lib/timeout.js'
+  import { RESET_TIMER, VOTE_RETRY_TIMEOUT } from '../lib/config.js'
   import Header from './Header.svelte'
 
   let pollTimeout = null
@@ -31,7 +32,10 @@
     if (fetching) return
     fetching = true
     try {
-      const { data, error } = await supabase.rpc('get_vote_counts')
+      const { data, error } = await withAbortableTimeout(
+        (signal) => supabase.rpc('get_vote_counts').abortSignal(signal),
+        VOTE_RETRY_TIMEOUT
+      )
 
       if (error) throw error
 
@@ -85,16 +89,11 @@
     refreshQueueCounts()
   }
 
-  onMount(async () => {
-    // Don't reset results here — the store is hydrated from cache.
-    // The bars animate from 0% via the `animated` flag below.
+  onMount(() => {
     refreshQueueCounts()
-    await fetchResults()
-    requestAnimationFrame(() => {
-      animated = true
-    })
+    requestAnimationFrame(() => { animated = true })
     startResetCountdown()
-    pollTimeout = setTimeout(pollLoop, backoffDelay(get(consecutiveFailures)))
+    pollLoop()
     document.addEventListener('visibilitychange', onVisibilityChange)
     window.addEventListener('online', onOnline)
     window.addEventListener('offline', onOffline)
