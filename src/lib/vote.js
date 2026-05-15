@@ -1,21 +1,7 @@
 import { supabase } from './supabase.js'
 import { saveToQueue, getQueue, removeFromQueue } from './queue.js'
 import { VOTE_RETRY_ATTEMPTS, VOTE_RETRY_TIMEOUT } from './config.js'
-
-/**
- * Run a Supabase request with an abortable timeout. The request is
- * actually cancelled on the wire when the timeout fires — not just
- * orphaned, as Promise.race would do.
- */
-export async function withAbortableTimeout(buildRequest, ms) {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), ms)
-  try {
-    return await buildRequest(controller.signal)
-  } finally {
-    clearTimeout(timer)
-  }
-}
+import { withAbortableTimeout } from './connection.js'
 
 export async function submitVote(vote) {
   if (!navigator.onLine) {

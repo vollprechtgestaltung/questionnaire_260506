@@ -1,4 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
+import { withAbortableTimeout } from './connection.js'
+import { VOTE_RETRY_TIMEOUT } from './config.js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -15,7 +17,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
  */
 export async function pingSupabase() {
   try {
-    const { error } = await supabase.from('votes').select('id').limit(1)
+    const { error } = await withAbortableTimeout(
+      (signal) => supabase.from('votes').select('id').limit(1).abortSignal(signal),
+      VOTE_RETRY_TIMEOUT
+    )
     return !error
   } catch {
     return false
