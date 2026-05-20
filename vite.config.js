@@ -7,6 +7,8 @@ export default defineConfig({
     environment: 'node',
     env: {
       VITE_SUBMIT_VOTE_URL: 'https://test.example.com/functions/v1/submit-vote',
+      VITE_SUPABASE_URL: 'https://test.example.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'test-anon-key',
     },
   },
   plugins: [

@@ -28,6 +28,7 @@ jobs:
         run: |
           for f in .claude/hooks/*.sh .githooks/* tests/*.sh; do
             [ -f "$f" ] || continue
+            [[ "$f" == *.md ]] && continue
             if [ ! -x "$f" ]; then
               echo "::error file=$f::not executable (chmod +x missing)"
               exit 1
