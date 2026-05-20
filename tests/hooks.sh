@@ -297,7 +297,7 @@ write_marker_at() {
 
 # Stale marker (>60s old) → removed, cleanup logged.
 rm -f "$SANDBOX_TEST_DIR/docs/sandbox-bypass.log"
-write_marker_at "$(date -v-2M '+%Y-%m-%dT%H:%M:%SZ')"
+write_marker_at "$(date -d '2 minutes ago' '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -v-2M '+%Y-%m-%dT%H:%M:%SZ')"
 "$HOOK_SESSION_START" > /dev/null 2>&1 || true
 if [ ! -f "$SANDBOX_TEST_DIR/.sandbox-bypass.marker" ]; then
   green "  ✓ stale marker removed"
