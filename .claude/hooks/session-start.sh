@@ -24,7 +24,9 @@ if [ -f .sandbox-bypass.marker ]; then
   granted_at=$(grep -m1 '^granted_at:' .sandbox-bypass.marker 2>/dev/null | sed 's/^granted_at:[[:space:]]*//' || true)
   granted_epoch=0
   if [ -n "$granted_at" ]; then
-    granted_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$granted_at" "+%s" 2>/dev/null || echo 0)
+    granted_epoch=$(date -d "$granted_at" "+%s" 2>/dev/null \
+      || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$granted_at" "+%s" 2>/dev/null \
+      || echo 0)
   fi
   now_epoch=$(date "+%s")
   age=$((now_epoch - granted_epoch))
