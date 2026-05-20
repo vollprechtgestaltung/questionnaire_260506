@@ -1,5 +1,7 @@
 # Learnings — Puls Questionnaire
 
+> When to read: bei Arbeit an Supabase (RLS, GRANT, Edge Functions), Svelte 5, PWA oder iPad-Spezifika; enthält dokumentierte Lessons-Learned aus dem Vorprojekt.
+
 ## Supabase Setup
 
 ### RLS allein reicht nicht — GRANT ist zwingend

@@ -9,7 +9,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "os": ["darwin"],
   "scripts": {
     "dev": "vite",
     "build": "vite build",

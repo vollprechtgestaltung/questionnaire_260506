@@ -59,11 +59,11 @@ History via Graft erhalten, Push manuell über VS Code.
 
 **Phase 5 — Git-History Graft (statt force-push)**
 
-- [ ] 2026-05-20 Vorprojekt-`.git/` über aktuelles `.git/` kopieren (graft preserviert komplette Vorprojekt-History inkl. Remote-URL)
-- [ ] 2026-05-20 Nach Graft: `git status` zeigt Template-Additions + Edits gegen Vorprojekt-HEAD; alles als **ein** Commit on top: „chore: rebase project on template v1.4.1 + bootstrap"
-- [ ] 2026-05-20 Verifizieren: `git log --oneline` zeigt alte Commits + neuen Bootstrap-Commit linear
-- [ ] 2026-05-20 Pre-Commit-Hook re-aktivieren (`git config core.hooksPath .githooks` — neue `.git/config` aus Graft hat das nicht mehr)
-- [ ] 2026-05-20 User pusht via VS Code (kein force nötig, ist fast-forward)
+- [x] 2026-05-20 Vorprojekt-`.git/` über aktuelles `.git/` kopieren (graft preserviert komplette Vorprojekt-History inkl. Remote-URL)
+- [x] 2026-05-20 Nach Graft: Commit `457a303d` on top — 79 files changed
+- [x] 2026-05-20 Verifizieren: `git log --oneline` zeigt alte Commits + neuen Bootstrap-Commit linear
+- [x] 2026-05-20 Pre-Commit-Hook re-aktiviert (`git config core.hooksPath .githooks`)
+- [ ] 2026-05-20 **User-Schritt:** pushen via VS Code (fast-forward, kein force nötig)
 
 **Phase 6 — Backend-Konfiguration (User-Schritt, nicht Claude)**
 

@@ -1,5 +1,7 @@
 # Supabase Heartbeat
 
+> When to read: bei Arbeit an `api/heartbeat.js`, Vercel-Cron-Konfiguration in `vercel.json`, oder wenn das Supabase-Projekt im Free-Tier zu pausieren droht.
+
 Hält das Supabase-Projekt im Free-Tier aktiv. Free-Tier-Projekte werden nach
 7 Tagen Inaktivität automatisch pausiert — dann wäre die App am Messetag tot.
 

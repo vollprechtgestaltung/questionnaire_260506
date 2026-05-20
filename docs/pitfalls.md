@@ -1,5 +1,7 @@
 # Known Pitfalls & Bugs
 
+> When to read: bei UI-, Touch-, PWA- oder Supabase-Integrations-Arbeit, besonders wenn etwas auf dem iPad anders verhält als im Desktop-Browser.
+
 Bekannte Fallstricke für PWA + Supabase Voting-App auf iPad (Messebetrieb).
 
 ## Touch / UX

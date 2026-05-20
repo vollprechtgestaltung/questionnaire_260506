@@ -1,5 +1,7 @@
 # Offline-Strategie & Duplikat-Absicherung
 
+> When to read: bei Arbeit an Queue (`src/lib/queue.js`), Cache, Service Worker, Duplikat-Erkennung oder dem Offline-Verhalten der App im Messebetrieb.
+
 ## Übersicht
 
 Die App muss auf Messen mit instabilem Netzwerk (MiFi) zuverlässig funktionieren.

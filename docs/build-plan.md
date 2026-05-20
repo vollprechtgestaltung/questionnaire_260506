@@ -1,5 +1,7 @@
 # Build Plan — Puls Questionnaire PWA
 
+> When to read: bei Fragen zum App-Implementierungsstand oder zur Reihenfolge der Aufbauschritte (Schritt 1–N); wenn ein neues Feature gegen den ursprünglichen Plan abgeglichen werden soll.
+
 Status-Legende: ⬜ offen · 🔄 in Arbeit · ✅ erledigt
 
 ---
