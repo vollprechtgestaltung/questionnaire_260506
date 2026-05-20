@@ -1,0 +1,30 @@
+# Template-Eigentum: Dateien/Ordner, die vom Update-Tool getrackt werden.
+#
+# Eine Zeile pro Pfad, relativ zum Projekt-Root. Verzeichnisse rekursiv
+# (mit trailing slash). Kommentare und Leerzeilen werden ignoriert.
+#
+# Was hier NICHT steht, ist Projekt-Eigentum und wird beim Update nicht
+# angefasst (typischerweise: CLAUDE.md, README.md, docs/stack.md,
+# docs/decisions.md, docs/todos.md, package.json, .gitignore,
+# alle anderen memory/*).
+#
+# Format-Version: 1
+
+.claude/hooks/
+.claude/commands/
+.claude/settings.json
+.githooks/
+tests/hooks.sh
+.github/workflows/check.yml
+docs/persistence.md
+docs/privacy.md
+docs/loeschkonzept.md
+docs/sandbox-bypass.md
+docs/template-versioning.md
+docs/sessions/README.md
+.github/workflows/README.md
+.githooks/README.md
+memory/template_baseline.md
+bin/
+.template-manifest
+CHANGELOG.md

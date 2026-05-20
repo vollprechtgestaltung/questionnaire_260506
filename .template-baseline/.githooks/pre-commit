@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# Pre-commit hook (opt-in via: git config core.hooksPath .githooks)
+#
+# Generic checks that work without a chosen stack:
+#  - block .env / secret files
+#  - block large files (> 5 MB) — usually a mistake
+#  - block obvious credential patterns in staged diff
+#  - run package.json scripts if present (lint, format:check, typecheck)
+
+set -euo pipefail
+
+red()   { printf '\033[31m%s\033[0m\n' "$1" >&2; }
+green() { printf '\033[32m%s\033[0m\n' "$1"; }
+
+staged() { git diff --cached --name-only --diff-filter=ACM; }
+
+fail=0
+
+# --- 1. Block .env files ---
+env_files=$(staged | grep -E '(^|/)\.env(\..*)?$' | grep -v '\.example$' || true)
+if [ -n "$env_files" ]; then
+  red "blocked: .env files staged for commit:"
+  printf '%s\n' "$env_files" >&2
+  fail=1
+fi
+
+# --- 2. Block large files ---
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  [ -f "$f" ] || continue
+  size=$(stat -f%z "$f" 2>/dev/null || stat -c%s "$f" 2>/dev/null || echo 0)
+  if [ "$size" -gt 5242880 ]; then
+    red "blocked: $f is larger than 5 MB ($size bytes). Use git-lfs or exclude."
+    fail=1
+  fi
+done < <(staged)
+
+# --- 3. Block obvious secret patterns in staged files ---
+# Heuristic only; not a substitute for a real secret scanner.
+# Skip meta files that contain the patterns as regex literals (CI workflow,
+# hook scripts, hook tests, this file itself).
+SECRET_RE='(aws_secret_access_key|api[_-]?key[[:space:]]*[:=][[:space:]]*["'\''][A-Za-z0-9_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sk-[a-zA-Z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{20,})'
+secret_files=""
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  [ -f "$f" ] || continue
+  case "$f" in
+    .githooks/*|.github/*|tests/hooks.sh|.claude/commands/*|bin/template-update.py|CHANGELOG.md|.template-manifest)
+      continue ;;
+    .template-baseline/*)
+      # baseline is a verbatim copy of tracked template files — same
+      # regex literals live there as in the originals.
+      continue ;;
+  esac
+  if grep -InE "$SECRET_RE" "$f" > /dev/null 2>&1; then
+    secret_files="${secret_files}\n${f}"
+  fi
+done < <(staged)
+if [ -n "$secret_files" ]; then
+  red "blocked: possible secrets in staged files:"
+  printf '%b\n' "$secret_files" >&2
+  red "Run grep to inspect, then either remove the secret or move the file to the meta-exclusion list in .githooks/pre-commit."
+  fail=1
+fi
+
+# --- 4. Validate staged JSON files ---
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  case "$f" in
+    *.json)
+      [ -f "$f" ] || continue
+      if ! python3 -m json.tool "$f" > /dev/null 2>&1; then
+        red "blocked: $f is not valid JSON"
+        fail=1
+      fi
+      ;;
+  esac
+done < <(staged)
+
+# --- 5. Run hook tests if any hook changed ---
+if staged | grep -qE '^(\.claude/hooks/|tests/hooks\.sh$)'; then
+  if [ -x tests/hooks.sh ]; then
+    green "▶ tests/hooks.sh (hooks changed)"
+    bash tests/hooks.sh || fail=1
+  fi
+fi
+
+# --- 6. Run package.json scripts if present ---
+if [ -f package.json ] && command -v npm > /dev/null 2>&1; then
+  for script in lint format:check typecheck; do
+    if npm run --silent | grep -qE "^  $script$"; then
+      green "▶ npm run $script"
+      npm run --silent "$script" || fail=1
+    fi
+  done
+fi
+
+if [ "$fail" -ne 0 ]; then
+  red "pre-commit failed — fix above or commit with --no-verify (discouraged)."
+  exit 1
+fi
+
+green "pre-commit ok"

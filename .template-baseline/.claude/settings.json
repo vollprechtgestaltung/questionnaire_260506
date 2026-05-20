@@ -20,7 +20,7 @@
       "allowRead": ["."]
     },
     "network": {
-      "allowedDomains": ["github.com", "npmjs.org", "*.supabase.co", "*.supabase.com", "*.vercel.app", "vercel.com"]
+      "allowedDomains": ["github.com", "npmjs.org"]
     }
   },
   "hooks": {

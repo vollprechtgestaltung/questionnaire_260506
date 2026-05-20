@@ -1,0 +1,128 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  template-integrity:
+    name: template integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate settings JSON
+        run: |
+          for f in .claude/settings.json .claude/settings.local.json; do
+            if [ -f "$f" ]; then
+              echo "▶ validating $f"
+              python3 -m json.tool "$f" > /dev/null
+            fi
+          done
+
+      - name: Hooks are executable
+        run: |
+          for f in .claude/hooks/*.sh .githooks/* tests/*.sh; do
+            [ -f "$f" ] || continue
+            if [ ! -x "$f" ]; then
+              echo "::error file=$f::not executable (chmod +x missing)"
+              exit 1
+            fi
+          done
+
+      - name: Hook test suite
+        run: bash tests/hooks.sh
+
+      - name: Doc trigger convention
+        run: |
+          # Every docs/*.md must declare its read-trigger as `> When to read:`
+          # directly after the H1 — enforced by session-start.sh, mirrored here.
+          missing=0
+          for f in docs/*.md; do
+            if ! grep -q '^> When to read:' "$f"; then
+              echo "::error file=$f::missing '> When to read:' line"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Secret scan (heuristics on full tree)
+        run: |
+          # Same heuristics as .githooks/pre-commit. Excludes meta files
+          # that contain the patterns as regex literals (CI workflow itself,
+          # hook scripts, hook tests, slash command docs).
+          hits=$(grep -rInE \
+            '(aws_secret_access_key|api[_-]?key[[:space:]]*[:=][[:space:]]*["'\''][A-Za-z0-9_-]{20,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sk-[a-zA-Z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|xox[baprs]-[A-Za-z0-9-]{20,})' \
+            --include='*.ts' --include='*.tsx' --include='*.js' --include='*.jsx' \
+            --include='*.mjs' --include='*.cjs' --include='*.json' --include='*.yml' \
+            --include='*.yaml' --include='*.md' --include='*.sh' --include='*.py' \
+            --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist \
+            --exclude-dir=build --exclude-dir=coverage \
+            --exclude-dir=.github --exclude-dir=.githooks \
+            --exclude='hooks.sh' --exclude='template-update.py' \
+            --exclude='CHANGELOG.md' --exclude='.template-manifest' \
+            --exclude-dir=commands \
+            --exclude-dir=.template-baseline \
+            . 2>/dev/null || true)
+          if [ -n "$hits" ]; then
+            echo "::error::possible secrets found:"
+            printf '%s\n' "$hits"
+            exit 1
+          fi
+
+      - name: Block .env files in repo
+        run: |
+          tracked=$(git ls-files | grep -E '(^|/)\.env(\..+)?$' | grep -v '\.example$' || true)
+          if [ -n "$tracked" ]; then
+            echo "::error::.env files tracked in git:"
+            printf '%s\n' "$tracked"
+            exit 1
+          fi
+
+  project-stack:
+    name: project stack (if present)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Node project
+        id: detect
+        run: |
+          if [ -f package.json ] && [ -f package-lock.json -o -f pnpm-lock.yaml -o -f yarn.lock -o -f bun.lockb ]; then
+            echo "has_node=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_node=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Node
+        if: steps.detect.outputs.has_node == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install
+        if: steps.detect.outputs.has_node == 'true'
+        run: |
+          if   [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile
+          elif [ -f yarn.lock ];      then corepack enable && yarn install --frozen-lockfile
+          elif [ -f bun.lockb ];      then npm i -g bun && bun install --frozen-lockfile
+          else                              npm ci
+          fi
+
+      - name: Run lint / typecheck / test (if script exists)
+        if: steps.detect.outputs.has_node == 'true'
+        run: |
+          set -e
+          for script in lint typecheck test; do
+            if node -e "process.exit(require('./package.json').scripts?.['$script'] ? 0 : 1)"; then
+              echo "▶ npm run $script"
+              npm run --silent "$script"
+            else
+              echo "— skip $script (not defined)"
+            fi
+          done
