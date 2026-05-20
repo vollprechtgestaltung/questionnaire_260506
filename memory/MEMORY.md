@@ -10,3 +10,4 @@ Each entry: one line, ~150 chars max:
 -->
 
 - [Template-Baseline](template_baseline.md) — Grund-Defaults aus dem Template (Plattform, Sync, Sprache, Hooks) — gelten, solange das Projekt sie nicht explizit widerruft.
+- [CI-Debug-Reihenfolge](feedback_ci_debugging.md) — Bei CI-Fails zuerst Job-Logs via GitHub-API holen, nicht lokal raten. Spart massiv Tokens.
