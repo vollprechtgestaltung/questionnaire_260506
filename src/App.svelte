@@ -94,7 +94,7 @@
 
   @media (max-width: 768px) {
     :global(:root) {
-      --header-height: 4rem;
+      --header-height: 5rem;
     }
   }
 
