@@ -66,7 +66,7 @@ describe('calcPercentages', () => {
   it('includes label and count from OPTIONS', () => {
     const merged = { 1: 5, 2: 3, 3: 0, 4: 2 }
     const { percentages } = calcPercentages(merged)
-    expect(percentages[0].label).toBe('Eine neue Perspektive')
+    expect(percentages[0].label).toBe('Eine neue Perspektive auf Vitiligo')
     expect(percentages[0].count).toBe(5)
     expect(percentages[0].id).toBe(1)
   })
