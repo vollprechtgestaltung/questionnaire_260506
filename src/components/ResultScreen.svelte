@@ -148,18 +148,20 @@
   main {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
+    height: 100svh;
     color: var(--color-navy);
   }
 
   .content {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 2rem 2rem 3rem;
     gap: 2rem;
+    overflow-y: auto;
   }
 
   .bars {
