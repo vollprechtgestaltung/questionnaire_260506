@@ -35,7 +35,7 @@
       padding: 0 1.5rem;
     }
     .brand {
-      height: 6rem;
+      height: 4rem;
     }
   }
 
