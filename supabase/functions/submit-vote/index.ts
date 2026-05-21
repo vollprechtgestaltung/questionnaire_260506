@@ -43,7 +43,7 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'invalid_json' }, 400, req)
   }
 
-  const { id, option, device_id } = body
+  const { id, option, device_id, queued, voted_at } = body
 
   if (!isUUID(id)) return json({ error: 'invalid_id' }, 400, req)
   if (typeof option !== 'number' || !Number.isInteger(option) || option < 1 || option > 4)
@@ -51,24 +51,49 @@ Deno.serve(async (req: Request) => {
   if (typeof device_id !== 'string' || device_id.trim().length === 0)
     return json({ error: 'invalid_device_id' }, 400, req)
 
+  // voted_at: original cast time (queued) or now (live). Falls back to now() for
+  // pre-migration queue entries that were saved without this field.
+  let votedAtMs = Date.now()
+  if (typeof voted_at === 'string') {
+    const ts = Date.parse(voted_at)
+    if (!isNaN(ts) && ts <= Date.now() + 5_000) votedAtMs = ts
+  }
+  const votedAtISO = new Date(votedAtMs).toISOString()
+
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
-  // Rate limit: 1 vote per device_id per RATE_LIMIT_WINDOW_MS
-  const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString()
-  const { count } = await supabase
-    .from('votes')
-    .select('*', { count: 'exact', head: true })
-    .eq('device_id', device_id)
-    .gte('created_at', since)
+  // Rate limit: check around the actual voting time.
+  // Live votes: check created_at in last 15s (catches pre-migration rows too).
+  // Queued votes: check voted_at ±15s so replayed votes are judged against their
+  //               original cast time, not the flush time.
+  let rateLimited = false
+  if (!queued) {
+    const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString()
+    const { count } = await supabase
+      .from('votes')
+      .select('*', { count: 'exact', head: true })
+      .eq('device_id', device_id)
+      .gte('created_at', since)
+    rateLimited = !!(count && count > 0)
+  } else {
+    const since = new Date(votedAtMs - RATE_LIMIT_WINDOW_MS).toISOString()
+    const until = new Date(votedAtMs + RATE_LIMIT_WINDOW_MS).toISOString()
 
-  if (count && count > 0) {
-    return json({ error: 'rate_limited' }, 429, req)
+    const { count } = await supabase
+      .from('votes')
+      .select('*', { count: 'exact', head: true })
+      .eq('device_id', device_id)
+      .gte('voted_at', since)
+      .lte('voted_at', until)
+    rateLimited = !!(count && count > 0)
   }
 
-  const { error } = await supabase.from('votes').insert({ id, option, device_id })
+  if (rateLimited) return json({ error: 'rate_limited' }, 429, req)
+
+  const { error } = await supabase.from('votes').insert({ id, option, device_id, voted_at: votedAtISO })
 
   if (error && error.code !== '23505') {
     return json({ error: error.message }, 500, req)

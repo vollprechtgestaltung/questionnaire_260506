@@ -42,7 +42,7 @@
     if (voted) return
     voted = true
 
-    const vote = { id: crypto.randomUUID(), option: optionId, device_id: deviceId }
+    const vote = { id: crypto.randomUUID(), option: optionId, device_id: deviceId, voted_at: new Date().toISOString() }
 
     submitting = true
     const { status } = await sendVote(vote)

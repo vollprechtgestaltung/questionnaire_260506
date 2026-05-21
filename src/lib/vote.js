@@ -43,7 +43,7 @@ export async function flushQueue() {
         fetch(SUBMIT_VOTE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(vote),
+          body: JSON.stringify({ ...vote, queued: true }),
           signal,
         }),
       VOTE_RETRY_TIMEOUT
