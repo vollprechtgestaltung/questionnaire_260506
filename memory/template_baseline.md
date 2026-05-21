@@ -29,6 +29,8 @@ nicht explizit widerruft:
   Marker ist single-use, TTL 60s. Der SDK-Default „just retry with
   sandbox disabled" gilt hier nicht.
 
+- **Prototyp → Production-Workflow:** Bei vollprecht-Projekten ist der übliche Weg: Prototyp solide bauen, dann direkt in Production überführen. Wenn ein Projekt als „Prototyp" startet, nicht als Qualitäts-Entschuldigung verwenden — von Anfang an production-tauglich bauen.
+
 **Why:** Diese Fakten ändern Claudes Verhalten in fast jeder Antwort
 (Sprachwahl, Pfad-Wahl, Stack-Gate, Hook-Vertrauen). Sie aus CLAUDE.md
 neu zu „lernen" kostet jede Session Context.

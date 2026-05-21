@@ -14,3 +14,4 @@ Each entry: one line, ~150 chars max:
 - [CI-Debug-Reihenfolge](feedback_ci_debugging.md) — Bei CI-Fails zuerst Job-Logs via GitHub-API holen, nicht lokal raten. Spart massiv Tokens.
 - [Git Author Email](feedback_git_author.md) — Nie userEmail aus Session-Kontext als Git-Author nutzen; korrekte Email: git@vollprecht.com.
 - [Voting Design](project_voting_design.md) — Mehrere Votes pro Gerät gewollt (1 iPad, Kiosk-Rückfall nach 20s); kein Admin-UI geplant.
+- [Production Status](project_production_status.md) — App läuft am echten Messetag; „Prototyp" aus CLAUDE.md nicht als Qualitäts-Relativierung verwenden.
