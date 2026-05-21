@@ -34,9 +34,6 @@
     header {
       padding: 0 1.5rem;
     }
-    .brand {
-      height: 4rem;
-    }
   }
 
   .toggle-wrapper {
@@ -46,7 +43,7 @@
   }
 
   .brand {
-    height: 8rem;
+    height: var(--header-height);
     width: auto;
   }
 
