@@ -13,9 +13,10 @@ Modi:
   --apply          Interaktiv: pro geänderter Datei y/n/diff/skip.
 
 Quelle:
-  - --source PATH                expliziter Override
-  - Env $TEMPLATE_PATH           zweite Priorität
-  - .template-version → source:  dritte Priorität
+  - --source PATH                              expliziter Override
+  - Env $TEMPLATE_PATH                         zweite Priorität
+  - .template-version → source:                dritte Priorität
+  - .template-version → source_fallbacks: …    vierte Priorität (Liste)
 """
 
 from __future__ import annotations
@@ -90,27 +91,57 @@ class TemplateMeta:
     version: str
     source: str | None
     adopted_at: str | None
+    source_fallbacks: list[str]
 
 def read_version(root: Path) -> TemplateMeta | None:
     f = root / VERSION_FILE
     if not f.is_file():
         return None
     data: dict[str, str] = {}
-    for line in f.read_text().splitlines():
+    fallbacks: list[str] = []
+    in_fallbacks = False
+    for raw in f.read_text().splitlines():
+        line = raw.rstrip()
+        if not line.strip():
+            in_fallbacks = False
+            continue
+        if in_fallbacks:
+            ms = re.match(r"^\s+-\s*(.+)$", line)
+            if ms:
+                fallbacks.append(os.path.expanduser(ms.group(1).strip()))
+                continue
+            in_fallbacks = False
         m = re.match(r"^([a-z_]+):\s*(.*)$", line.strip())
         if m:
-            data[m.group(1)] = m.group(2).strip()
+            key, val = m.group(1), m.group(2).strip()
+            if key == "source_fallbacks":
+                in_fallbacks = True
+                if val:
+                    # inline list not supported; ignore inline value
+                    pass
+            else:
+                data[key] = val
     return TemplateMeta(
         version=data.get("version", "?"),
         source=data.get("source") or None,
         adopted_at=data.get("adopted_at") or None,
+        source_fallbacks=fallbacks,
     )
 
-def write_version(root: Path, version: str, source: str | None) -> None:
+def write_version(
+    root: Path,
+    version: str,
+    source: str | None,
+    source_fallbacks: list[str] | None = None,
+) -> None:
     lines = [f"version: {version}"]
     if source:
         lines.append(f"source: {source}")
     lines.append(f"adopted_at: {date.today().isoformat()}")
+    if source_fallbacks:
+        lines.append("source_fallbacks:")
+        for fb in source_fallbacks:
+            lines.append(f"  - {fb}")
     (root / VERSION_FILE).write_text("\n".join(lines) + "\n")
 
 
@@ -136,6 +167,11 @@ def resolve_source(root: Path, explicit: str | None) -> Path:
     meta = read_version(root)
     if meta and meta.source:
         candidates.append((f"{VERSION_FILE}:source", (root / meta.source).resolve()))
+    if meta and meta.source_fallbacks:
+        for i, fb in enumerate(meta.source_fallbacks):
+            candidates.append(
+                (f"{VERSION_FILE}:source_fallbacks[{i}]", Path(fb).expanduser())
+            )
     if not candidates:
         die(
             f"no template source resolved. Set $TEMPLATE_PATH, pass --source, "
@@ -143,7 +179,11 @@ def resolve_source(root: Path, explicit: str | None) -> Path:
         )
     for label, path in candidates:
         if path.is_dir() and (path / PACKAGE_JSON).is_file() and (path / MANIFEST_FILE).is_file():
+            print(gray(f"  using {label}={path}"))
             return path
+        if label.startswith(f"{VERSION_FILE}:source_fallbacks") and not path.exists():
+            # silently skip non-existent fallbacks
+            continue
         print(yellow(f"  ignored {label}={path} (not a template root)"))
     die("no usable template source among candidates")
 
@@ -227,7 +267,13 @@ def cmd_init(root: Path, source: Path) -> int:
         rel_source = os.path.relpath(source, root)
     except ValueError:
         rel_source = str(source)
-    write_version(root, template_version, rel_source)
+    existing = read_version(root)
+    write_version(
+        root,
+        template_version,
+        rel_source,
+        existing.source_fallbacks if existing else None,
+    )
     print(green(f"\ninitialized v{template_version} ({rel_source})"))
     return 0
 
@@ -332,7 +378,12 @@ def cmd_check_or_apply(root: Path, source: Path, apply: bool) -> int:
             rel_source = os.path.relpath(source, root)
         except ValueError:
             rel_source = str(source)
-        write_version(root, template_version, rel_source)
+        write_version(
+            root,
+            template_version,
+            rel_source,
+            meta.source_fallbacks if meta else None,
+        )
 
     print()
     print(bold("summary:"))

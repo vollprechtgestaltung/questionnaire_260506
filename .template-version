@@ -1,3 +1,5 @@
-version: 1.4.1
+version: 1.5.0
 source: ../../../../../../90_dev/__claude_base/_template-base-002
-adopted_at: 2026-05-20
+source_fallbacks:
+  - /Users/tobias06/Library/CloudStorage/Dropbox-vollprechtgestaltung/vollprecht gestaltung/90_dev/__claude_base/_template-base-002
+adopted_at: 2026-05-21

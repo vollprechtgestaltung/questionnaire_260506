@@ -57,6 +57,49 @@ gegen den dort verlinkten Stand.
 
 ---
 
+## [1.5.0] — 2026-05-21
+
+**Was:** `source_fallbacks` in `.template-version` für Multi-Maschinen-
+Setups. `bin/template-update.py` akzeptiert jetzt eine YAML-Liste
+absoluter Pfade als zusätzliche Fallback-Kandidaten nach `source:`.
+
+- `bin/template-update.py`: `TemplateMeta.source_fallbacks` neu, von
+  `read_version()` aus einer `source_fallbacks:`-Liste gelesen,
+  von `write_version()` wieder rausgeschrieben. `resolve_source()`
+  hängt die Fallbacks in Reihenfolge an die Kandidatenliste an;
+  nicht-existente Fallbacks werden still übersprungen.
+- `docs/template-versioning.md`: Abschnitt „Mehrere Maschinen /
+  wechselnde Pfade" mit Beispiel-Snippet ergänzt.
+
+**Warum:** Wenn dasselbe Projekt auf mehreren Maschinen mit
+unterschiedlichen User-Homes liegt (Dropbox/iCloud zwischen
+`/Users/tobias07` und `/Users/tobias06`), bricht der relative
+`source:`-Pfad sobald die Projektdatei verschoben wird, und ein
+absoluter Pfad funktioniert nur auf einer Maschine. Die
+Fallback-Liste vermeidet pro-Maschinen-`settings.local.json`-Pflege.
+
+**Migration:** Keine. Projekte ohne `source_fallbacks` verhalten
+sich identisch.
+
+---
+
+## [1.4.4] — 2026-05-20
+
+**Was:** Portabilität für Linux-CI hergestellt (drei Bugs aus
+pls-INC006-questionaire zurückgemeldet).
+
+- `package.json`: `"os": ["darwin"]` entfernt — blockierte `npm ci`
+  auf Ubuntu-Runnern mit „Unsupported platform".
+- `.claude/hooks/check-sandbox-bypass.sh` + `session-start.sh`:
+  BSD-only `date -j -f` → portables GNU-first / BSD-fallback-Pattern.
+- `tests/hooks.sh`: BSD-only `date -v-2M` → portables GNU-first /
+  BSD-fallback-Pattern.
+
+**Warum:** GitHub Actions läuft auf Ubuntu; alle drei Stellen silent-
+failed auf GNU date, was CI zuverlässig rot machte.
+
+---
+
 ## [1.4.3] — 2026-05-19
 
 **Was:** `bootstrap.md` (Schritt 1, Template-Quelle bestimmen) verwendet
