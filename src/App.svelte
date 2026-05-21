@@ -108,6 +108,7 @@
     background: var(--bg);
     color: var(--fg);
     height: 100svh;
+    padding-top: env(safe-area-inset-top);
     overflow: hidden;
     overscroll-behavior: none;
     touch-action: manipulation;

@@ -177,12 +177,14 @@
   .row-header {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: flex-end;
+    gap: 15vw;
   }
 
   .label {
     font-size: clamp(0.9rem, 2vw, 1.2rem);
     font-weight: 500;
+    text-wrap: balance;
   }
 
   .track {
@@ -202,6 +204,8 @@
   .pct {
     font-size: clamp(1rem, 2vw, 1.3rem);
     font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .skip {
