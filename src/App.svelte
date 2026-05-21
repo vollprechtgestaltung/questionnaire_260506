@@ -92,6 +92,12 @@
     user-select: none;
   }
 
+  @media (max-width: 768px) {
+    :global(:root) {
+      --header-height: 6rem;
+    }
+  }
+
   :global(:root[data-theme="dark"]) {
     --bg: #0a0a0a;
     --fg: #f5f5f5;
