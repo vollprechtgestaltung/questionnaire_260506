@@ -82,7 +82,7 @@
   main {
     display: flex;
     flex-direction: column;
-    height: 100dvh;
+    height: 100svh;
   }
 
   .question {

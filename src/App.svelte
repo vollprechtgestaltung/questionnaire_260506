@@ -101,7 +101,7 @@
   :global(body) {
     background: var(--bg);
     color: var(--fg);
-    height: 100dvh;
+    height: 100svh;
     overflow: hidden;
     overscroll-behavior: none;
     touch-action: manipulation;
@@ -109,11 +109,11 @@
   }
 
   :global(#app) {
-    height: 100dvh;
+    height: 100svh;
   }
 
   .error-screen {
-    height: 100dvh;
+    height: 100svh;
     display: flex;
     flex-direction: column;
     align-items: center;
