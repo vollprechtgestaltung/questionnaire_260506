@@ -40,7 +40,7 @@
 <style>
   .indicator {
     position: fixed;
-    bottom: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom));
     right: 3rem;
     z-index: 100;
     display: flex;
@@ -84,7 +84,7 @@
   @media (max-width: 768px) {
     .indicator {
       right: 1.5rem;
-      bottom: 1.5rem;
+      bottom: calc(1.5rem + env(safe-area-inset-bottom));
     }
   }
 </style>

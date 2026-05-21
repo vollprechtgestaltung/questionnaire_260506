@@ -221,7 +221,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
-    padding: 1rem 3rem;
+    padding: 1rem 3rem calc(1rem + env(safe-area-inset-bottom));
     font-size: 0.85rem;
     opacity: 0.4;
     color: var(--color-dark-grey);
