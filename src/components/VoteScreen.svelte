@@ -6,6 +6,7 @@
   import { reportSuccess, reportFailure } from '../lib/connection.js'
   import { QUESTION, OPTIONS } from '../lib/config.js'
   import Header from './Header.svelte'
+  import AppFooter from './AppFooter.svelte'
 
   let voted = $state(false)
   let submitting = $state(false)
@@ -76,6 +77,7 @@
     </div>
   {/if}
 
+  <AppFooter />
 </main>
 
 <style>
@@ -110,7 +112,7 @@
     width: 100vw;
     background: var(--bg);
     gap: 1px;
-    padding: 0 3rem 3rem;
+    padding: 0 3rem;
     box-sizing: border-box;
   }
 
@@ -179,7 +181,7 @@
       flex: none;
       grid-template-columns: 1fr;
       grid-template-rows: repeat(4, 1fr);
-      padding: 0 1.5rem 3.5rem;
+      padding: 0 1.5rem;
       height: 60svh;
     }
 

@@ -10,6 +10,7 @@
   import { withAbortableTimeout } from '../lib/timeout.js'
   import { RESET_TIMER, VOTE_RETRY_TIMEOUT } from '../lib/config.js'
   import Header from './Header.svelte'
+  import AppFooter from './AppFooter.svelte'
 
   let pollTimeout = null
   let resetTimeout = null
@@ -135,11 +136,12 @@
   </div>
 
   </div>
-  <div class="statusbar">
-    <span>{total} Antworten</span>
-    <button class="skip" onclick={() => currentScreen.set('vote')} aria-label="Zurück zur Abstimmung">{secondsLeft}s</button>
-    <span></span>
-  </div>
+  <AppFooter showTimestamp={true}>
+    {#snippet left()}{total} Antworten{/snippet}
+    {#snippet center()}
+      <button class="skip" onclick={() => currentScreen.set('vote')} aria-label="Zurück zur Abstimmung">{secondsLeft}s</button>
+    {/snippet}
+  </AppFooter>
 </main>
 
 <style>
@@ -217,20 +219,5 @@
     text-align: center;
   }
 
-  .statusbar {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    align-items: center;
-    padding: 1rem 3rem calc(1rem + env(safe-area-inset-bottom));
-    font-size: 0.85rem;
-    opacity: 0.4;
-    color: var(--color-dark-grey);
-  }
-
-  @media (max-width: 768px) {
-    .statusbar {
-      padding: 1rem 1.5rem;
-    }
-  }
 
 </style>

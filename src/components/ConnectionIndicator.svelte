@@ -39,52 +39,29 @@
 
 <style>
   .indicator {
-    position: fixed;
-    bottom: calc(1rem + env(safe-area-inset-bottom));
-    right: 3rem;
-    z-index: 100;
     display: flex;
     align-items: center;
     gap: 0.4rem;
     font-size: 0.7rem;
-    opacity: 0.5;
     pointer-events: none;
-    color: var(--color-dark-grey);
   }
 
   .indicator[data-status='error'],
-  .indicator[data-status='offline'] {
+  .indicator[data-status='offline'],
+  .indicator[data-status='unreachable'] {
     opacity: 1;
+    font-weight: 600;
   }
 
   .dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
+    flex-shrink: 0;
   }
 
-  [data-status='ok'] .dot {
-    background: #48bb78;
-  }
-  [data-status='error'] .dot {
-    background: #e53e3e;
-  }
-  [data-status='offline'] .dot {
-    background: #ecc94b;
-  }
-  [data-status='unreachable'] .dot {
-    background: #e53e3e;
-  }
-
-  .indicator[data-status='unreachable'] {
-    opacity: 1;
-    font-weight: 600;
-  }
-
-  @media (max-width: 768px) {
-    .indicator {
-      right: 1.5rem;
-      bottom: calc(1.5rem + env(safe-area-inset-bottom));
-    }
-  }
+  [data-status='ok'] .dot { background: #48bb78; }
+  [data-status='error'] .dot { background: #e53e3e; }
+  [data-status='offline'] .dot { background: #ecc94b; }
+  [data-status='unreachable'] .dot { background: #e53e3e; }
 </style>

@@ -3,7 +3,6 @@
   import { currentScreen, updateAvailable } from './stores/app.js'
   import VoteScreen from './components/VoteScreen.svelte'
   import ResultScreen from './components/ResultScreen.svelte'
-  import ConnectionIndicator from './components/ConnectionIndicator.svelte'
 
   let wakeLock = null
 
@@ -49,10 +48,8 @@
 
 <svelte:boundary onerror={handleError}>
   {#if $currentScreen === 'vote'}
-    <ConnectionIndicator />
     <VoteScreen />
   {:else if $currentScreen === 'result'}
-    <ConnectionIndicator showTimestamp={true} />
     <ResultScreen />
   {/if}
 
@@ -73,6 +70,7 @@
 
   :global(:root) {
     --header-height: 8rem;
+    --footer-height: 3rem;
 
     --color-navy: #2D2850;
     --color-blue-teal: #1D8190;
