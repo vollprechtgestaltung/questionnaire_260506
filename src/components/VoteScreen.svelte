@@ -176,6 +176,7 @@
       grid-template-columns: 1fr;
       grid-template-rows: repeat(4, 1fr);
       padding: 0 1.5rem 3.5rem;
+      max-height: 50svh;
     }
 
     button:nth-child(1) { border-radius: 1.5rem 1.5rem 0 0; }
@@ -184,7 +185,7 @@
     button:nth-child(4) { border-radius: 0 0 1.5rem 1.5rem; }
 
     button {
-      padding: 1.5rem 3rem;
+      padding: 0.75rem 3rem;
       font-size: clamp(1.125rem, 3vw, 1.666rem);
     }
   }
