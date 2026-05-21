@@ -18,8 +18,8 @@ export const QUEUE_MAX_SIZE = 500 // max votes kept in localStorage queue; oldes
 export const QUESTION = 'Was verändert diese Erfahrung für Sie?'
 
 export const OPTIONS = [
-  { id: 1, label: 'Eine neue Perspektive' },
-  { id: 2, label: 'Mehr Empathie' },
-  { id: 3, label: 'Besseres Verständnis' },
-  { id: 4, label: 'Verstärkter Handlungsbedarf' }
+  { id: 1, label: 'Eine neue Perspektive auf Vitiligo' },
+  { id: 2, label: 'Mehr Empathie im Umgang mit Patientinnen und Patienten' },
+  { id: 3, label: 'Ein besseres Verständnis der psychosozialen Auswirkungen' },
+  { id: 4, label: 'Ein verstärkter Handlungsbedarf in der Behandlung' }
 ]

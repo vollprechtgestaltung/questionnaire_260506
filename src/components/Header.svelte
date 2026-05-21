@@ -12,26 +12,33 @@
 </script>
 
 <header>
-  <span class="brand">brand name</span>
-  <button class="toggle" onclick={toggle} aria-label="Theme wechseln" class:dark>
-    <span class="knob"></span>
-  </button>
+  <img class="brand" src="/opzelura.svg" alt="Opzelura" />
+  <div class="toggle-wrapper" style="display:none">
+    <button class="toggle" onclick={toggle} aria-label="Theme wechseln" class:dark>
+      <span class="knob"></span>
+    </button>
+  </div>
 </header>
 
 <style>
   header {
-    height: 5rem;
+    height: var(--header-height);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 0 2rem;
+    padding: 0 3rem;
     flex-shrink: 0;
   }
 
+  .toggle-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+
   .brand {
-    font-size: clamp(1rem, 2.5vw, 2rem);
-    font-weight: 500;
-    color: var(--fg);
+    height: 8rem;
+    width: auto;
   }
 
   .toggle {

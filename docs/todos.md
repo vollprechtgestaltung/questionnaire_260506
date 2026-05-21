@@ -63,16 +63,16 @@ History via Graft erhalten, Push manuell über VS Code.
 - [x] 2026-05-20 Nach Graft: Commit `457a303d` on top — 79 files changed
 - [x] 2026-05-20 Verifizieren: `git log --oneline` zeigt alte Commits + neuen Bootstrap-Commit linear
 - [x] 2026-05-20 Pre-Commit-Hook re-aktiviert (`git config core.hooksPath .githooks`)
-- [ ] 2026-05-20 **User-Schritt:** pushen via VS Code (fast-forward, kein force nötig)
+- [x] 2026-05-20 **User-Schritt:** pushen via VS Code (fast-forward, kein force nötig)
 
 **Phase 6 — Backend-Konfiguration (User-Schritt, nicht Claude)**
 
-- [ ] 2026-05-20 User kopiert `.env` aus Vorprojekt von Hand
-- [ ] 2026-05-20 Supabase-Projekt `zgqxmooimqhugszgreki` bleibt; Edge Function muss nicht redeployed werden, solange `ALLOWED_ORIGIN` unverändert
+- [x] 2026-05-20 User kopiert `.env` aus Vorprojekt von Hand
+- [x] 2026-05-20 Supabase-Projekt `zgqxmooimqhugszgreki` bleibt; Edge Function muss nicht redeployed werden, solange `ALLOWED_ORIGIN` unverändert
 
 **Phase 7 — Session-Summary**
 
-- [ ] 2026-05-20 `docs/sessions/2026-05-20-XXXX.md` schreiben: was portiert, was bewusst übersprungen, Git-Graft dokumentieren
+- [x] 2026-05-20 `docs/sessions/2026-05-20-XXXX.md` schreiben: was portiert, was bewusst übersprungen, Git-Graft dokumentieren
 
 **Risiken / Stolpersteine (zur Erinnerung):**
 

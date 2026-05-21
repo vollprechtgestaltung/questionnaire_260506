@@ -86,46 +86,56 @@
   }
 
   .question {
-    height: calc(50vh - 5rem);
+    height: calc(40vh - var(--header-height));
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 2rem 10%;
+    padding: 0 2rem;
   }
 
   h1 {
-    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-size: clamp(1.5rem, 4vw, 2.75rem);
     text-align: center;
     font-weight: 600;
     max-width: 60ch;
+    color: var(--color-navy);
+    margin-bottom: calc(var(--header-height) / 3);
   }
 
   .options {
+    flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     width: 100vw;
     background: var(--bg);
-    gap: 0;
-    padding: 4px;
+    gap: 1px;
+    padding: 0 3rem 3rem;
+    box-sizing: border-box;
   }
 
   button {
     width: 100%;
-    height: 25vh;
-    font-size: clamp(1rem, 2.5vw, 2rem);
+    height: 100%;
+    font-size: clamp(1rem, 2.5vw, 1.666rem);
     font-weight: 500;
-    color: inherit;
-    border: 2px solid var(--bg);
-    background: var(--surface);
+    color: #ffffff;
+    border: none;
+    background: var(--color-blue-teal);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s;
     text-align: center;
     line-height: 1.3;
+    padding: 3rem 5rem;
   }
 
+  button:nth-child(1) { border-top-left-radius: 1.5rem; }
+  button:nth-child(2) { border-top-right-radius: 1.5rem; }
+  button:nth-child(3) { border-bottom-left-radius: 1.5rem; }
+  button:nth-child(4) { border-bottom-right-radius: 1.5rem; }
+
   button:not(:disabled):active {
-    background: currentColor;
-    color: var(--bg);
+    background: var(--color-coral);
   }
 
   button:disabled {

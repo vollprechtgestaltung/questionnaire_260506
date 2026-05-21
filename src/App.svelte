@@ -72,6 +72,15 @@
   }
 
   :global(:root) {
+    --header-height: 8rem;
+
+    --color-navy: #2D2850;
+    --color-blue-teal: #1D8190;
+    --color-light-blue: #ECF4F9;
+    --color-blue: #A2C7E1;
+    --color-coral: #F15D5E;
+    --color-warm-grey: #D8D4D7;
+
     --bg: #f5f5f5;
     --fg: #0a0a0a;
     --surface: rgba(0, 0, 0, 0.08);
