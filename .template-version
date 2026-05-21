@@ -1,5 +1,5 @@
 version: 1.5.0
-source: ../../../../../../90_dev/__claude_base/_template-base-002
-source_fallbacks:
-  - /Users/tobias06/Library/CloudStorage/Dropbox-vollprechtgestaltung/vollprecht gestaltung/90_dev/__claude_base/_template-base-002
+source: ../../../../../../90_dev/__claude_base/_claude-tmpl-base
 adopted_at: 2026-05-21
+source_fallbacks:
+  - /Users/tobias06/Library/CloudStorage/Dropbox-vollprechtgestaltung/vollprecht gestaltung/90_dev/__claude_base/_claude-tmpl-base

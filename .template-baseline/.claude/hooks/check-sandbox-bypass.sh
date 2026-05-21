@@ -87,8 +87,9 @@ if [ -z "$granted_at" ]; then
   exit 2
 fi
 
-# macOS-only date parsing (matches the project's platform constraint).
-granted_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$granted_at" "+%s" 2>/dev/null || echo 0)
+granted_epoch=$(date -d "$granted_at" "+%s" 2>/dev/null \
+  || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$granted_at" "+%s" 2>/dev/null \
+  || echo 0)
 now_epoch=$(date "+%s")
 age=$((now_epoch - granted_epoch))
 

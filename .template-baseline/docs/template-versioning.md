@@ -53,11 +53,11 @@ Beispiel `.template-version`:
 
 ```yaml
 version: 1.5.0
-source: ../../../../../../90_dev/__claude_base/_template-base-webflow-002
+source: ../../../../../../90_dev/__claude_base/_claude-tmpl-base-webflow
 adopted_at: 2026-05-21
 source_fallbacks:
-  - /Users/tobias07/Library/CloudStorage/Dropbox-.../90_dev/__claude_base/_template-base-webflow-002
-  - /Users/tobias06/Library/CloudStorage/Dropbox-.../90_dev/__claude_base/_template-base-webflow-002
+  - /Users/tobias07/Library/CloudStorage/Dropbox-.../90_dev/__claude_base/_claude-tmpl-base-webflow
+  - /Users/tobias06/Library/CloudStorage/Dropbox-.../90_dev/__claude_base/_claude-tmpl-base-webflow
 ```
 
 **Auflösungsreihenfolge:** `--source` → `$TEMPLATE_PATH` → `source` →

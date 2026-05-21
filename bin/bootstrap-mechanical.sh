@@ -38,7 +38,7 @@ if [ -f .template-version ]; then
 fi
 
 basename_self=$(basename "$(pwd)")
-if [[ "$basename_self" == _template-base-* ]]; then
+if [[ "$basename_self" == _claude-tmpl-* ]]; then
   echo "error: refuse to bootstrap inside the template itself ($basename_self)." >&2
   exit 2
 fi

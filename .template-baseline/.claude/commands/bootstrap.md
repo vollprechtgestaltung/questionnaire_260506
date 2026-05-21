@@ -10,12 +10,12 @@ REQUIRED" gemeldet. Wenn nicht: nicht ausführen.
 ```bash
 # Default-Pfad zuerst prüfen (identisch auf allen vollprecht-Maschinen,
 # nur der User-Ordner unter /Users/ unterscheidet sich — daher $HOME).
-TEMPLATE_DEFAULT="$HOME/Library/CloudStorage/Dropbox-vollprechtgestaltung/vollprecht gestaltung/90_dev/__claude_base/_template-base-002"
+TEMPLATE_DEFAULT="$HOME/Library/CloudStorage/Dropbox-vollprechtgestaltung/vollprecht gestaltung/90_dev/__claude_base/_claude-tmpl-base"
 if [ -d "$TEMPLATE_DEFAULT" ] && [ -f "$TEMPLATE_DEFAULT/.template-version" ]; then
   echo "$TEMPLATE_DEFAULT"
 else
-  # Fallback: suche andere _template-base-* unter CloudStorage
-  find "$HOME/Library/CloudStorage" -maxdepth 8 -type d -name "_template-base-*" 2>/dev/null | head -3
+  # Fallback: suche andere _claude-tmpl-* unter CloudStorage
+  find "$HOME/Library/CloudStorage" -maxdepth 8 -type d -name "_claude-tmpl-*" 2>/dev/null | head -3
 fi
 ```
 

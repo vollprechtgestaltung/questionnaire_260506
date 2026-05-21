@@ -1,5 +1,5 @@
 Aktualisiere dieses Projekt auf den neuesten Stand des Templates
-(`_template-base-002`). Erst dry-run, dann auf Wunsch des Users `--apply`.
+(`_claude-tmpl-base`). Erst dry-run, dann auf Wunsch des Users `--apply`.
 
 ## Ablauf
 

@@ -54,7 +54,7 @@ echo
 # loud BOOTSTRAP-REQUIRED warning so Claude can drive /project:bootstrap
 # before any other work happens.
 project_basename=$(basename "$(pwd)")
-if [[ "$project_basename" == _template-base-* ]]; then
+if [[ "$project_basename" == _claude-tmpl-* ]]; then
   : # this is the template source itself, never warn
 elif [ -f .template-version ]; then
   : # already bootstrapped, normal session

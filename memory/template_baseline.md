@@ -4,7 +4,7 @@ description: Grund-Fakten, die in jedem aus diesem Template instanziierten Proje
 type: project
 ---
 
-Dieses Projekt basiert auf `_template-base-002` (vollprecht gestaltung).
+Dieses Projekt basiert auf `_claude-tmpl-base` (vollprecht gestaltung).
 Grund-Setup, das ohne Nachfrage gilt — solange das aktuelle Projekt es
 nicht explizit widerruft:
 

@@ -113,7 +113,7 @@ matcht (`no matches found`). Resultat: der Bootstrap fragt den User
 trotzdem nach dem Pfad — bei jedem neuen Projekt aufs Neue. Der
 Default-Pfad ist über alle vollprecht-Maschinen identisch
 (`$HOME/Library/CloudStorage/Dropbox-vollprechtgestaltung/vollprecht
-gestaltung/90_dev/__claude_base/_template-base-002`), nur das
+gestaltung/90_dev/__claude_base/_claude-tmpl-base`), nur das
 User-Verzeichnis variiert.
 
 **Migration:** Keine — `bootstrap.md` ist im `.template-manifest`
