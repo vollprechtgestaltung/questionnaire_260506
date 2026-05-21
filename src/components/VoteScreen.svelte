@@ -180,7 +180,7 @@
       grid-template-columns: 1fr;
       grid-template-rows: repeat(4, 1fr);
       padding: 0 1.5rem 3.5rem;
-      height: 50svh;
+      height: 60svh;
     }
 
     button:nth-child(1) { border-radius: 1.5rem 1.5rem 0 0; }
