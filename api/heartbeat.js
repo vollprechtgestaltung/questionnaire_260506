@@ -37,6 +37,6 @@ export default async function handler(request, response) {
       timestamp: new Date().toISOString()
     })
   } catch (error) {
-    return response.status(500).json({ ok: false, error: error.message })
+    return response.status(500).json({ ok: false, error: 'internal_error' })
   }
 }
