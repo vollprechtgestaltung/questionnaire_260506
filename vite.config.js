@@ -16,13 +16,13 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['opzelura-icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Puls Questionnaire',
         short_name: 'Puls',
         description: 'Messe-Abstimmung',
-        theme_color: '#000000',
-        background_color: '#000000',
+        theme_color: '#ffffff',
+        background_color: '#ffffff',
         display: 'fullscreen',
         orientation: 'landscape',
         start_url: '/',

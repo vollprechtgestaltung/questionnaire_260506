@@ -80,6 +80,7 @@
     --color-blue: #A2C7E1;
     --color-coral: #F15D5E;
     --color-warm-grey: #D8D4D7;
+    --color-dark-grey: #837c89;
 
     --bg: #f5f5f5;
     --fg: #0a0a0a;

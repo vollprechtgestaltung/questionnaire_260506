@@ -49,6 +49,7 @@
     font-size: 0.7rem;
     opacity: 0.5;
     pointer-events: none;
+    color: var(--color-dark-grey);
   }
 
   .indicator[data-status='error'],

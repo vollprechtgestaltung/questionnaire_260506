@@ -1,20 +1,27 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { createClient } from "jsr:@supabase/supabase-js@2"
 
-const ALLOWED_ORIGIN = 'https://questionnaire-260506.vercel.app'
+const ALLOWED_ORIGINS = [
+  'https://questionnaire-260506.vercel.app',
+  'http://localhost:5173',
+]
 
-const CORS = {
-  'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
-  'Access-Control-Allow-Headers': 'content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+function corsHeaders(req: Request) {
+  const origin = req.headers.get('origin') ?? ''
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  }
 }
 
 const RATE_LIMIT_WINDOW_MS = 15_000
 
-function json(body: unknown, status = 200) {
+function json(body: unknown, status = 200, req?: Request) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...CORS, 'Content-Type': 'application/json' },
+    headers: { ...(req ? corsHeaders(req) : {}), 'Content-Type': 'application/json' },
   })
 }
 
@@ -26,23 +33,23 @@ function isUUID(s: unknown): s is string {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
-  if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405)
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req) })
+  if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, req)
 
   let body: Record<string, unknown>
   try {
     body = await req.json()
   } catch {
-    return json({ error: 'invalid_json' }, 400)
+    return json({ error: 'invalid_json' }, 400, req)
   }
 
   const { id, option, device_id } = body
 
-  if (!isUUID(id)) return json({ error: 'invalid_id' }, 400)
+  if (!isUUID(id)) return json({ error: 'invalid_id' }, 400, req)
   if (typeof option !== 'number' || !Number.isInteger(option) || option < 1 || option > 4)
-    return json({ error: 'invalid_option' }, 400)
+    return json({ error: 'invalid_option' }, 400, req)
   if (typeof device_id !== 'string' || device_id.trim().length === 0)
-    return json({ error: 'invalid_device_id' }, 400)
+    return json({ error: 'invalid_device_id' }, 400, req)
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -58,14 +65,14 @@ Deno.serve(async (req: Request) => {
     .gte('created_at', since)
 
   if (count && count > 0) {
-    return json({ error: 'rate_limited' }, 429)
+    return json({ error: 'rate_limited' }, 429, req)
   }
 
   const { error } = await supabase.from('votes').insert({ id, option, device_id })
 
   if (error && error.code !== '23505') {
-    return json({ error: error.message }, 500)
+    return json({ error: error.message }, 500, req)
   }
 
-  return json({ ok: true })
+  return json({ ok: true }, 200, req)
 })

@@ -147,6 +147,7 @@
     display: flex;
     flex-direction: column;
     height: 100dvh;
+    color: var(--color-navy);
   }
 
   .content {
@@ -185,7 +186,7 @@
   }
 
   .track {
-    background: var(--surface);
+    background: var(--color-warm-grey);
     height: 2.5rem;
     overflow: hidden;
     width: 100%;
@@ -193,7 +194,7 @@
 
   .bar {
     height: 100%;
-    background: currentColor;
+    background: var(--color-coral);
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 0%;
   }
@@ -219,6 +220,7 @@
     padding: 1rem 2rem;
     font-size: 0.85rem;
     opacity: 0.4;
+    color: var(--color-dark-grey);
   }
 
 </style>
