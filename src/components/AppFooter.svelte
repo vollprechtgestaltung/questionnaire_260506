@@ -16,7 +16,7 @@
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
     min-height: var(--footer-height);
-    padding: 0.5rem 3rem calc(0.5rem + env(safe-area-inset-bottom));
+    padding: 0.5rem var(--layout-px) calc(0.5rem + env(safe-area-inset-bottom));
     font-size: 0.85rem;
     opacity: 0.4;
     color: var(--color-dark-grey);
@@ -34,7 +34,7 @@
 
   @media (max-width: 768px) {
     .app-footer {
-      padding: 0.5rem 1.5rem calc(0.5rem + env(safe-area-inset-bottom));
+      padding: 0.5rem var(--layout-px) calc(0.5rem + env(safe-area-inset-bottom));
     }
   }
 </style>

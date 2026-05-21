@@ -159,7 +159,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 2rem 2rem 3rem;
+    padding: 2rem var(--layout-px) 3rem;
     gap: 2rem;
     overflow-y: auto;
   }

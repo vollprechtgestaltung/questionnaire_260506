@@ -71,6 +71,7 @@
   :global(:root) {
     --header-height: 8rem;
     --footer-height: 3rem;
+    --layout-px: 3rem;
 
     --color-navy: #2D2850;
     --color-blue-teal: #1D8190;
@@ -93,6 +94,7 @@
   @media (max-width: 768px) {
     :global(:root) {
       --header-height: 5rem;
+      --layout-px: 1.5rem;
     }
   }
 

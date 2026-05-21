@@ -26,13 +26,13 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 0 3rem;
+    padding: 0 var(--layout-px);
     flex-shrink: 0;
   }
 
   @media (max-width: 768px) {
     header {
-      padding: 0 1.5rem;
+      padding: 0 var(--layout-px);
     }
   }
 

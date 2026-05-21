@@ -112,7 +112,7 @@
     width: 100vw;
     background: var(--bg);
     gap: 1px;
-    padding: 0 3rem;
+    padding: 0 var(--layout-px);
     box-sizing: border-box;
   }
 
@@ -169,7 +169,7 @@
     .question {
       flex: 1;
       height: auto;
-      padding: 0 4.5rem;
+      padding: 0 calc(var(--layout-px) * 3);
     }
 
     h1 {
@@ -181,7 +181,7 @@
       flex: none;
       grid-template-columns: 1fr;
       grid-template-rows: repeat(4, 1fr);
-      padding: 0 1.5rem;
+      padding: 0 var(--layout-px);
       height: 50svh;
     }
 
