@@ -34,21 +34,22 @@ export async function submitVote(vote) {
 
 export async function flushQueue() {
   const queue = getQueue()
-  for (const vote of queue) {
-    try {
-      const res = await withAbortableTimeout(
-        (signal) =>
-          fetch(SUBMIT_VOTE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(vote),
-            signal,
-          }),
-        VOTE_RETRY_TIMEOUT
-      )
-      if (res.ok) removeFromQueue(vote.id)
-    } catch {
-      // Will retry on next poll cycle
-    }
+  if (queue.length === 0) return
+
+  const vote = queue[0]
+  try {
+    const res = await withAbortableTimeout(
+      (signal) =>
+        fetch(SUBMIT_VOTE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(vote),
+          signal,
+        }),
+      VOTE_RETRY_TIMEOUT
+    )
+    if (res.ok) removeFromQueue(vote.id)
+  } catch {
+    // Will retry on next poll cycle
   }
 }

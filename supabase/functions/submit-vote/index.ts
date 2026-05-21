@@ -1,9 +1,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { createClient } from "jsr:@supabase/supabase-js@2"
 
-const ALLOWED_ORIGINS = [
-  'https://questionnaire-260506.vercel.app',
-  'http://localhost:5173',
+const ALLOWED_ORIGINS: string[] = [
+  Deno.env.get('ALLOWED_ORIGIN') ?? 'https://questionnaire-260506.vercel.app',
+  ...( Deno.env.get('ALLOWED_ORIGIN_DEV') ? [Deno.env.get('ALLOWED_ORIGIN_DEV')!] : [] ),
 ]
 
 function corsHeaders(req: Request) {

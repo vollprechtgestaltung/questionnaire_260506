@@ -14,7 +14,7 @@ export default defineConfig({
   plugins: [
     svelte(),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       injectRegister: false,
       includeAssets: ['opzelura-icon.svg', 'apple-touch-icon.png'],
       manifest: {

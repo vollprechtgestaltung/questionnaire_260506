@@ -23,15 +23,31 @@ export const updateAvailable = writable(false)
 // honest across reloads.
 export const lastFetchAt = writable(loadCachedTimestamp())
 
-// Persistent device ID — generated once, stored in localStorage
+// Stable fingerprint from browser properties — survives localStorage clears
+function browserFingerprint() {
+  const raw = [
+    navigator.language,
+    typeof screen !== 'undefined' ? `${screen.width}x${screen.height}x${screen.colorDepth}` : '',
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+    navigator.hardwareConcurrency ?? 0,
+  ].join('|')
+  let hash = 5381
+  for (let i = 0; i < raw.length; i++) {
+    hash = ((hash << 5) + hash) ^ raw.charCodeAt(i)
+    hash = hash & hash
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0')
+}
+
+// Persistent device ID: UUID (localStorage) + browser fingerprint
 function getDeviceId() {
   const key = 'puls_device_id'
-  let id = localStorage.getItem(key)
-  if (!id) {
-    id = crypto.randomUUID()
-    localStorage.setItem(key, id)
+  let uuid = localStorage.getItem(key)
+  if (!uuid) {
+    uuid = crypto.randomUUID()
+    localStorage.setItem(key, uuid)
   }
-  return id
+  return `${uuid}-${browserFingerprint()}`
 }
 
 export const deviceId = getDeviceId()

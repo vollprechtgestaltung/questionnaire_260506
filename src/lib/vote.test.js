@@ -101,12 +101,16 @@ describe('flushQueue', () => {
     fetchMock.mockReset()
   })
 
-  it('flushes all votes from queue on success', async () => {
+  it('flushes one vote per call, drains queue across calls', async () => {
     const v1 = { id: '1', option: 1, device_id: 'd' }
     const v2 = { id: '2', option: 2, device_id: 'd' }
     saveToQueue(v1)
     saveToQueue(v2)
     fetchMock.mockResolvedValue(okResponse())
+
+    await flushQueue()
+    expect(getQueue()).toEqual([v2])
+    expect(fetchMock).toHaveBeenCalledTimes(1)
 
     await flushQueue()
     expect(getQueue()).toEqual([])
