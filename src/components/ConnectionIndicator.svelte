@@ -41,7 +41,7 @@
   .indicator {
     position: fixed;
     bottom: 1rem;
-    right: 1rem;
+    right: 3rem;
     z-index: 100;
     display: flex;
     align-items: center;
@@ -79,5 +79,12 @@
   .indicator[data-status='unreachable'] {
     opacity: 1;
     font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .indicator {
+      right: 1.5rem;
+      bottom: 1.5rem;
+    }
   }
 </style>

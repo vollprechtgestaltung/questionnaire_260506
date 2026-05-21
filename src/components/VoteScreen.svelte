@@ -163,4 +163,30 @@
     to { transform: rotate(360deg); }
   }
 
+  @media (max-width: 768px) {
+    .question {
+      padding: 0 4.5rem;
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 5vw, 2rem);
+    }
+
+    .options {
+      grid-template-columns: 1fr;
+      grid-template-rows: repeat(4, 1fr);
+      padding: 0 1.5rem 3.5rem;
+    }
+
+    button:nth-child(1) { border-radius: 1.5rem 1.5rem 0 0; }
+    button:nth-child(2) { border-radius: 0; }
+    button:nth-child(3) { border-radius: 0; }
+    button:nth-child(4) { border-radius: 0 0 1.5rem 1.5rem; }
+
+    button {
+      padding: 1.5rem 3rem;
+      font-size: clamp(1.125rem, 3vw, 1.666rem);
+    }
+  }
+
 </style>

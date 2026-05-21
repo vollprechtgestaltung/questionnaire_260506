@@ -217,10 +217,16 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 1rem 3rem;
     font-size: 0.85rem;
     opacity: 0.4;
     color: var(--color-dark-grey);
+  }
+
+  @media (max-width: 768px) {
+    .statusbar {
+      padding: 1rem 1.5rem;
+    }
   }
 
 </style>

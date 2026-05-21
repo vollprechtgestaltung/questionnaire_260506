@@ -30,6 +30,12 @@
     flex-shrink: 0;
   }
 
+  @media (max-width: 768px) {
+    header {
+      padding: 0 1.5rem;
+    }
+  }
+
   .toggle-wrapper {
     display: flex;
     align-items: center;
