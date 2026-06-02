@@ -65,10 +65,12 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
-  // Rate limit: check around the actual voting time.
-  // Live votes: check created_at in last 15s (catches pre-migration rows too).
-  // Queued votes: check voted_at ±15s so replayed votes are judged against their
-  //               original cast time, not the flush time.
+  // Rate limit: always check voted_at (actual cast time), never created_at.
+  // Using created_at for live votes caused false 429s: a queue drain inserts old
+  // votes with created_at = now, which would block the next live vote even though
+  // 20s had passed since the actual cast time.
+  // Live votes:   voted_at >= (now - 15s)
+  // Queued votes: voted_at within ±15s of this vote's original cast time
   let rateLimited = false
   if (!queued) {
     const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString()
@@ -76,7 +78,7 @@ Deno.serve(async (req: Request) => {
       .from('votes')
       .select('*', { count: 'exact', head: true })
       .eq('device_id', device_id)
-      .gte('created_at', since)
+      .gte('voted_at', since)
     rateLimited = !!(count && count > 0)
   } else {
     const since = new Date(votedAtMs - RATE_LIMIT_WINDOW_MS).toISOString()

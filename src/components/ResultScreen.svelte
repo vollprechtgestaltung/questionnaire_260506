@@ -11,6 +11,7 @@
   import { RESET_TIMER, VOTE_RETRY_TIMEOUT } from '../lib/config.js'
   import Header from './Header.svelte'
   import AppFooter from './AppFooter.svelte'
+  import PublicationCode from './PublicationCode.svelte'
 
   let pollTimeout = null
   let resetTimeout = null
@@ -136,6 +137,7 @@
   </div>
 
   </div>
+  <PublicationCode />
   <AppFooter showTimestamp={true}>
     {#snippet left()}{total} Antworten{/snippet}
     {#snippet center()}
@@ -146,6 +148,7 @@
 
 <style>
   main {
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100svh;

@@ -7,6 +7,7 @@
   import { QUESTION, OPTIONS } from '../lib/config.js'
   import Header from './Header.svelte'
   import AppFooter from './AppFooter.svelte'
+  import PublicationCode from './PublicationCode.svelte'
 
   let voted = $state(false)
   let submitting = $state(false)
@@ -77,11 +78,13 @@
     </div>
   {/if}
 
+  <PublicationCode />
   <AppFooter />
 </main>
 
 <style>
   main {
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100svh;
@@ -146,10 +149,10 @@
   }
 
   .loader-overlay {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 50vh;
   }
 
   .spinner {
