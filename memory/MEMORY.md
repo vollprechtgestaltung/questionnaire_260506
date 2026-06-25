@@ -13,6 +13,7 @@ Each entry: one line, ~150 chars max:
 - [Multi-Machine-Setup](multi_machine_setup.md) — User arbeitet auf tobias07 + tobias06; Dropbox-Pfad sonst identisch → keine absoluten Pfade in geteilten Dateien.
 - [CI-Debug-Reihenfolge](feedback_ci_debugging.md) — Bei CI-Fails zuerst Job-Logs via GitHub-API holen, nicht lokal raten. Spart massiv Tokens.
 - [Git Author Email](feedback_git_author.md) — Nie userEmail aus Session-Kontext als Git-Author nutzen; korrekte Email: git@vollprecht.com.
+- [Kein ungefragter Branch](feedback_no_unprompted_branch.md) — Bei "commit + push" auf den aktuellen Branch (main) committen; Branch nur auf explizite Anweisung.
 - [Voting Design](project_voting_design.md) — Mehrere Votes pro Gerät gewollt (1 iPad, Kiosk-Rückfall nach 20s); kein Admin-UI geplant.
 - [Production Status](project_production_status.md) — App läuft am echten Messetag; „Prototyp" aus CLAUDE.md nicht als Qualitäts-Relativierung verwenden.
 - [Messe-Prep](project_messe_prep.md) — Messe Mitte/Ende August 2026; vorher DB-Wipe + Supabase-Restore + Pro-Upgrade als ein Schritt.
