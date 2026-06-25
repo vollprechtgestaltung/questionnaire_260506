@@ -16,8 +16,6 @@ function corsHeaders(req: Request) {
   }
 }
 
-const RATE_LIMIT_WINDOW_MS = 15_000
-
 function json(body: unknown, status = 200, req?: Request) {
   return new Response(JSON.stringify(body), {
     status,
@@ -43,7 +41,7 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'invalid_json' }, 400, req)
   }
 
-  const { id, option, device_id, queued, voted_at } = body
+  const { id, option, device_id, voted_at } = body
 
   if (!isUUID(id)) return json({ error: 'invalid_id' }, 400, req)
   if (typeof option !== 'number' || !Number.isInteger(option) || option < 1 || option > 4)
@@ -65,36 +63,10 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
-  // Rate limit: always check voted_at (actual cast time), never created_at.
-  // Using created_at for live votes caused false 429s: a queue drain inserts old
-  // votes with created_at = now, which would block the next live vote even though
-  // 20s had passed since the actual cast time.
-  // Live votes:   voted_at >= (now - 15s)
-  // Queued votes: voted_at within ±15s of this vote's original cast time
-  let rateLimited = false
-  if (!queued) {
-    const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString()
-    const { count } = await supabase
-      .from('votes')
-      .select('*', { count: 'exact', head: true })
-      .eq('device_id', device_id)
-      .gte('voted_at', since)
-    rateLimited = !!(count && count > 0)
-  } else {
-    const since = new Date(votedAtMs - RATE_LIMIT_WINDOW_MS).toISOString()
-    const until = new Date(votedAtMs + RATE_LIMIT_WINDOW_MS).toISOString()
-
-    const { count } = await supabase
-      .from('votes')
-      .select('*', { count: 'exact', head: true })
-      .eq('device_id', device_id)
-      .gte('voted_at', since)
-      .lte('voted_at', until)
-    rateLimited = !!(count && count > 0)
-  }
-
-  if (rateLimited) return json({ error: 'rate_limited' }, 429, req)
-
+  // No rate limiting: it protected against neither real visitors (the UI already
+  // prevents rapid re-voting) nor bots (device_id is client-supplied and trivially
+  // varied), but caused a 429 retry storm. Duplicate protection is the UNIQUE id
+  // constraint + 23505-as-success below.
   const { error } = await supabase.from('votes').insert({ id, option, device_id, voted_at: votedAtISO })
 
   if (error && error.code !== '23505') {

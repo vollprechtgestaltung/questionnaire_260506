@@ -140,9 +140,7 @@
   <PublicationCode />
   <AppFooter showTimestamp={true}>
     {#snippet left()}{total} Antworten{/snippet}
-    {#snippet center()}
-      <button class="skip" onclick={() => currentScreen.set('vote')} aria-label="Zurück zur Abstimmung">{secondsLeft}s</button>
-    {/snippet}
+    {#snippet center()}{secondsLeft}s{/snippet}
   </AppFooter>
 </main>
 
@@ -214,15 +212,5 @@
     white-space: nowrap;
     flex-shrink: 0;
   }
-
-  .skip {
-    background: none;
-    border: none;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    text-align: center;
-  }
-
 
 </style>

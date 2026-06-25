@@ -47,7 +47,9 @@
 
     submitting = true
     const { status } = await sendVote(vote)
-    if (status === 'ok') reportSuccess()
+    // 'ok' = stored, 'rejected' = server reached but declined — both mean the
+    // backend is reachable. Only 'queued' (offline / retries exhausted) is a failure.
+    if (status === 'ok' || status === 'rejected') reportSuccess()
     else reportFailure()
     submitting = false
     currentScreen.set('result')

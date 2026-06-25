@@ -28,6 +28,7 @@ const { getQueue, saveToQueue } = await import('./queue.js')
 const vote = () => ({ id: 'test-uuid', option: 1, device_id: 'dev-1' })
 const okResponse = () => new Response(JSON.stringify({ ok: true }), { status: 200 })
 const errResponse = () => new Response(JSON.stringify({ error: 'fail' }), { status: 500 })
+const rejectedResponse = () => new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429 })
 
 describe('submitVote', () => {
   beforeEach(() => {
@@ -81,6 +82,15 @@ describe('submitVote', () => {
     expect(getQueue()).toEqual([v])
   })
 
+  it('does not retry or queue on a terminal 4xx rejection', async () => {
+    fetchMock.mockResolvedValue(rejectedResponse())
+    const v = vote()
+    const result = await submitVote(v)
+    expect(result).toEqual({ status: 'rejected', code: 429 })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(getQueue()).toEqual([])
+  })
+
   it('queues vote when fetch times out', async () => {
     fetchMock.mockImplementation(
       () =>
@@ -126,13 +136,22 @@ describe('flushQueue', () => {
     expect(getQueue()).toEqual([])
   })
 
-  it('keeps vote in queue on error response', async () => {
+  it('keeps vote in queue on transient 5xx error', async () => {
     const v = { id: 'err', option: 1, device_id: 'd' }
     saveToQueue(v)
     fetchMock.mockResolvedValue(errResponse())
 
     await flushQueue()
     expect(getQueue()).toEqual([v])
+  })
+
+  it('drops vote on a terminal 4xx rejection (no retry storm)', async () => {
+    const v = { id: 'reject', option: 1, device_id: 'd' }
+    saveToQueue(v)
+    fetchMock.mockResolvedValue(rejectedResponse())
+
+    await flushQueue()
+    expect(getQueue()).toEqual([])
   })
 
   it('keeps vote in queue when fetch throws', async () => {

@@ -19,16 +19,27 @@ Votes dürfen weder verloren gehen noch doppelt gezählt werden.
 - **UX:** Sofortiger Wechsel zum Ergebnis-Screen
 
 ### 3. Online, Insert schlägt fehl
-- **Erkennung:** Supabase gibt Fehler zurück oder Request hat Timeout (4s pro Versuch)
-- **Verhalten:** Bis zu 3 Retries mit je 4s Timeout. Nach letztem Fehlschlag → Queue
+- **Erkennung:** Supabase gibt Fehler zurück oder Request hat Timeout (`VOTE_RETRY_TIMEOUT` = 3s pro Versuch)
+- **Verhalten:** Unterscheidung terminal vs. vorübergehend (siehe unten). Nur
+  *vorübergehende* Fehler werden wiederholt (`VOTE_RETRY_ATTEMPTS` = 2 Versuche),
+  nach dem letzten Fehlschlag → Queue. Ein *terminaler* 4xx wird verworfen, nicht
+  gequeued.
 - **UX:** Loader (Spinner) sichtbar während Retries, danach Ergebnis-Screen
+
+### Terminal vs. vorübergehend (`isTerminal` in `src/lib/vote.js`)
+- **Terminal (4xx):** Der Server hat den Vote endgültig abgelehnt (z.B. kaputter
+  Payload). Wiederholen oder Queuen würde ewig schleifen — der Vote wird **verworfen**.
+- **Vorübergehend (5xx / Netzwerkfehler / Timeout):** Server evtl. erreichbar, aber
+  gerade nicht — wird wiederholt bzw. bleibt in der Queue für den nächsten Zyklus.
+- **Warum das zählt:** Ein 4xx, der wie ein vorübergehender Fehler behandelt wurde
+  (endlos retry auf `queue[0]`), war die Ursache des 429-Retry-Sturms.
 
 ## Queue-Mechanismus
 
 - **Speicherort:** `localStorage` unter Key `puls_vote_queue` (`src/lib/queue.js`)
 - **Persistenz:** Überlebt App-Neustarts und iPad-Reboots
 - **Flush-Trigger:** Nach jedem erfolgreichen Supabase-Poll im Ergebnis-Screen (alle 2.5s)
-- **Einzeln abgearbeitet:** Jeder Vote wird einzeln inserted und bei Erfolg einzeln entfernt — kein Datenverlust bei Teilfehlern
+- **Einzeln abgearbeitet:** Jeder Vote wird einzeln inserted und bei Erfolg **oder terminaler Ablehnung (4xx)** einzeln entfernt — bei vorübergehendem Fehler bleibt er für den nächsten Zyklus. So blockiert ein nicht-zustellbarer Vote nie den Rest der Queue (kein Head-of-Line-Blocking).
 
 ## Duplikat-Absicherung (zwei Schichten)
 
@@ -44,6 +55,14 @@ Votes dürfen weder verloren gehen noch doppelt gezählt werden.
 
 ### Warum zwei Schichten?
 Die stabile ID allein reicht nicht: Wenn ein Insert durchgeht aber die HTTP-Response verloren geht (Netzwerkabbruch während Response), weiss die App nicht, dass der Vote in der DB ist. Sie queued ihn erneut. Ohne den UNIQUE Constraint wäre das ein Duplikat. Ohne die korrekte Behandlung von `23505` in `flushQueue()` würde der Vote endlos in der Queue kreisen.
+
+### Kein Server-Rate-Limit (mehr)
+Die Edge Function hatte ein 15s-Rate-Limit pro `device_id`. Es ist entfernt
+(Entscheid in `docs/decisions.md`): Es schützte weder echte Besucher (die UI
+verhindert schnelles Re-Voten bereits — 20s-Reset + `voted`-Flag im VoteScreen)
+noch gegen Bots (`device_id` kommt aus dem Client-Payload, trivial variierbar),
+verursachte aber den 429-Sturm. Duplikat-Schutz läuft allein über die obigen zwei
+Schichten (UNIQUE id + `23505`). Mehrfach-Votes pro Gerät sind ausdrücklich gewollt.
 
 ## Beteiligte Dateien
 

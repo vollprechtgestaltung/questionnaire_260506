@@ -33,6 +33,25 @@ Regeln:
 
 ---
 
+## 2026-06-25 — Server-Rate-Limit entfernt, Dedup nur über UNIQUE id
+
+**Status:** accepted
+
+**Kontext:** Die Edge Function `submit-vote` lehnte Votes ab, wenn dieselbe `device_id` innerhalb von 15s schon einen Vote abgesetzt hatte (429). Das Limit war 2026-05-15 als Schutz gegen schnelles Mehrfach-Klicken eingeführt, mit der Annahme „liegt unter dem 20s-Reset, trifft legitime Nutzung nie". Der versteckte Skip-Button („Geister-Button") im Result-Footer brach diese Annahme: Votes <15s wurden möglich, vom Limit abgelehnt — und der Client behandelte das 429 als vorübergehenden Fehler und wiederholte `queue[0]` endlos (429-Sturm, sichtbar in Safari; lokale Queue-Anzeige inflationierte den Count).
+
+**Entscheidung:** Das zeitbasierte Rate-Limit wird ersatzlos entfernt. Duplikat-Schutz läuft allein über stabile UUID + UNIQUE-Constraint + `23505`-als-Erfolg. Zusätzlich: Client unterscheidet terminale (4xx → verwerfen) von vorübergehenden Fehlern (5xx/Netz/Timeout → wiederholen). Der Geister-Button wird entfernt — einziger Rückweg zum Vote-Screen ist der 20s-Reset.
+
+**Begründung:** Das Limit schützte gegen niemanden: echte Besucher können wegen 20s-Reset + `voted`-Flag ohnehin nicht schnell re-voten; Bots umgehen es trivial, da `device_id` im Client-Payload steht (und der Endpunkt ohne Auth öffentlich ist). Mehrfach-Votes pro Gerät sind ausdrücklich gewollt (1 iPad, viele Besucher). Es verursachte nur den Sturm. Ein client-seitiges Bypass-Flag wurde verworfen (redundant zur UUID-Dedup, aushebelbar, Over-Engineering).
+
+**Konsequenzen:**
+- (+) Kein 429-Sturm mehr; festhängende Queue-Votes lösen sich auf.
+- (+) Schnelle (Test-)Votes zählen alle; kein Head-of-Line-Blocking der Queue.
+- (+) Robuste Fehlerklasse-Trennung schützt vor künftigen terminalen Fehlern.
+- (−) Kein server-seitiger Flood-Backstop mehr. Für einen öffentlichen No-Auth-Voting-Endpunkt ist echter Bot-Schutz ohnehin nur mit Auth/Token-Architektur möglich (out of scope).
+- (!) **Deploy nötig:** Repo-Edit deployt die Edge Function nicht automatisch — `submit-vote` muss neu deployed werden.
+
+---
+
 ## 2026-05-20 — Plain JS statt TypeScript strict für die Portierung
 
 **Status:** accepted
