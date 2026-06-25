@@ -1,6 +1,9 @@
 # Local settings
 .claude/settings.local.json
 
+# Claude Code preview tool (local dev-server launch config, not project source)
+.claude/launch.json
+
 # Sandbox-bypass machinery (ephemeral, never commit)
 .sandbox-bypass.marker
 docs/sandbox-bypass.log
