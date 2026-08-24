@@ -1,17 +1,31 @@
 ---
 name: project_messe_prep
-description: Messetermin Mitte/Ende August 2026 + Vor-Messe-Checkliste (DB-Wipe, Supabase-Restore, Pro-Upgrade).
+description: Messe ab 2026-08-26; Vor-Messe-Checkliste (Zwei-Schritt-DB-Wipe). Supabase bleibt bewusst Free — kein Pro-Upgrade.
 metadata:
   type: project
 ---
 
-Der Messeeinsatz ist **Mitte/Ende August 2026** (Stand: vom User am 2026-06-25 genannt, kein exaktes Datum).
+Die Messe beginnt am **2026-08-26** (vom User am 2026-08-24 genannt). DB-Bereinigung am **2026-08-25** früh.
 
-**Why:** Bis dahin laufen nur Test-/Keep-alive-Daten in der `votes`-Tabelle. Mehrere Tasks hängen am Termin, nicht am heutigen Tag.
+**Why:** Bis zur Messe liegen nur Handtest-Daten in `votes`. Der Zähler muss bei Türöffnung auf 0 stehen.
 
-**How to apply:** Kurz **vor** der Messe als ein Schritt erledigen:
-- **DB-Wipe** für sauberen Count: `DELETE FROM votes;` (aktuell ~476 Test-Zeilen, alle vor der Messe). Vorher mit User bestätigen — destruktiv.
-- **Supabase-Restore** falls Free-Tier-Projekt pausiert wurde (90-Tage-Fenster) + **Upgrade auf Supabase Pro** (kein Auto-Pause), siehe [[project_production_status]] und Session 2026-06-15.
-- Festhängende lokale Queues (`puls_vote_queue`) in Test-Browsern ggf. leeren (lösen sich seit Rate-Limit-Entfernung aber selbst auf).
+**How to apply:**
+
+- **Zwei-Schritt-Wipe**, nicht einer. `DELETE FROM votes;` am 25.08. gibt einen sauberen
+  Ausgangspunkt fürs iPad-Setup — aber die Pflicht-Testvotes aus `docs/todos.md`
+  („Testvote auf jedem iPad") landen danach wieder in der Tabelle. Der **zweite Wipe
+  kurz vor Türöffnung** ist der, der zählt. Jeder Wipe: vorher CSV-Export ins Projekt,
+  nachher Count verifizieren. Destruktiv → jedes Mal vom User bestätigen lassen.
+- **Kein Supabase-Pro-Upgrade.** Entscheid User 2026-08-24: Pro war nur als Reaktion
+  geplant, falls Supabase die Free-Tier-DB pausiert. Ist nie passiert (Projekt
+  durchgehend `ACTIVE_HEALTHY`), also nicht nötig. Konsequenz: kein Point-in-Time-
+  Recovery → der CSV-Export vor jedem `DELETE` ist das einzige Backup.
+- Festhängende lokale Queues (`puls_vote_queue`) in Test-Browsern ggf. leeren
+  (lösen sich seit Rate-Limit-Entfernung aber selbst auf).
+
+**Korrektur (2026-08-24):** Frühere Annahme „Keep-alive füllt die Tabelle neu" ist
+falsch. `api/heartbeat.js` macht ausschliesslich `select id ... limit 1` — kein Insert.
+Neue Zeilen entstehen nur durch echte Votes bzw. Handtests.
 
 Restliche Geräte-/Standchecks: `docs/todos.md` (iPad-Setup, MiFi, Guided Access, Backup-iPad).
+Siehe auch [[project_production_status]], [[project_voting_design]].
