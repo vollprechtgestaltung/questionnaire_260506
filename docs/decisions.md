@@ -33,6 +33,25 @@ Regeln:
 
 ---
 
+## 2026-08-24 — Supabase bleibt im Free-Plan, kein Pro-Upgrade
+
+**Status:** accepted
+
+**Kontext:** Seit der Free-Tier-Pause im Juni 2026 stand ein Upgrade auf Supabase Pro als Vor-Messe-Task in `memory/project_messe_prep`. Begründet war es ausschliesslich mit dem Risiko, dass Supabase das Projekt wegen Inaktivität pausiert — am Messetag wäre die App damit tot. Seit Einführung des täglichen Vercel-Cron-Heartbeats (`api/heartbeat.js`, 06:00 UTC) ist das Projekt durchgehend `ACTIVE_HEALTHY`; die Pause ist nie eingetreten.
+
+**Entscheidung:** Kein Pro-Upgrade. Das Projekt läuft auch während der Messe im Free-Plan.
+
+**Begründung:** Der einzige Auslöser für das Upgrade war ein Risiko, das der Heartbeat bereits abdeckt — Pro hätte dasselbe Problem ein zweites Mal gelöst. Die Messe ist ein Einsatz über wenige Tage mit erwartbar niedrigem Volumen; die Free-Limits (500 MB DB, 5 GB Egress) sind bei ~4 KB pro Vote um Grössenordnungen entfernt. Ein Upgrade wäre eine laufende Kostenposition gegen einen Fall, der nicht eintritt.
+
+**Konsequenzen:**
+
+- Positiv: keine Kosten, keine Plan-Migration kurz vor dem Einsatz.
+- Negativ: **kein Point-in-Time-Recovery.** Ein versehentliches `DELETE` oder ein Datenverlust während der Messe ist nicht aus Supabase heraus wiederherstellbar. Deshalb gilt: **vor jedem `DELETE FROM votes;` ein CSV-Export ins Projekt** (`backups/`, git-getrackt). Der Export ist das einzige Backup.
+- Negativ: Der Heartbeat wird damit zur kritischen Infrastruktur. Fällt der Vercel-Cron aus, pausiert das Projekt nach 7 Tagen Inaktivität. Vor längeren Pausen zwischen Einsätzen den Cron-Status prüfen.
+- Falls sich die Lage ändert (mehrtägiger Dauereinsatz, echte Besucherdaten mit Wiederherstellungsbedarf): neue ADR, diese hier auf `superseded` setzen.
+
+---
+
 ## 2026-06-25 — Server-Rate-Limit entfernt, Dedup nur über UNIQUE id
 
 **Status:** accepted

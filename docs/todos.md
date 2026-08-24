@@ -81,53 +81,63 @@ History via Graft erhalten, Push manuell über VS Code.
 - Network-Allowlist VOR Phase 5+6, sonst Sandbox-Block bei Supabase/Vercel-Calls
 - Nach Graft: alte `.git/hooks/` aus Vorprojekt ist NICHT unser `.githooks/` — Pre-Commit muss neu aktiviert werden
 
-### Übergabe an Messebauer (aus Vorprojekt übernommen)
+### Messe 2026-08-26
 
-Zu klären und dokumentieren vor dem Messeeinsatz.
-
-**Setup iPad**
-
-- [ ] Anleitung: Safari → Teilen → Zum Home-Bildschirm (PWA-Installation)
-- [ ] iPad-Einstellungen: Auto-Lock «Nie», Lautstärke, Helligkeit, Benachrichtigungen aus, WLAN zum MiFi
-- [ ] Schriftarten / Sprache prüfen
-
-**Kiosk-Modus (Guided Access)**
-
-- [ ] Guided Access aktivieren (Einstellungen → Bedienungshilfen → Geführter Zugriff)
-- [ ] Code festlegen und dokumentieren
-- [ ] Bedienungselemente einschränken (Home, Lautstärke, Touchbereiche)
-- [ ] Test: Besucher kann App nicht verlassen
-
-**Fehler-Handling vor Ort**
-
-- [ ] Was tun bei rotem «Server nicht erreichbar»-Indikator?
-- [ ] Was tun bei eingefrorenem Bildschirm? (Guided Access aufheben, App neu starten)
-- [ ] Ansprechpartner am Messetag bei technischen Problemen definieren
-- [ ] Backup-iPad vorbereiten und identisch konfigurieren
-
-**Offline-Betrieb**
-
-- [ ] Queue-Limit dokumentieren: 500 Votes pro iPad, letzte Zahlen bleiben sichtbar
-- [ ] Verhalten bei aufgebrauchtem MiFi-Datenvolumen klären
-- [ ] Empfohlene Mindest-Bandbreite festhalten
-
-**Don'ts (Messepersonal)**
-
-- [ ] iPad nicht komplett ausschalten (Standby reicht)
-- [ ] Browser-/Website-Daten nicht löschen (Queue + Cache weg)
-- [ ] Während aktivem Vote kein Neustart
-- [ ] Keine anderen Apps während Messebetrieb
-- [ ] iPad nicht länger in Hintergrund (Wake Lock geht verloren)
-
-**Checkliste vor Messebeginn**
-
-- [ ] Alle iPads im selben WLAN
-- [ ] Alle iPads zeigen «Online»
-- [ ] Testvote auf jedem iPad → erscheint auf allen anderen
-- [ ] MiFi geladen und SIM-Datenvolumen aktiv
-- [ ] Ersatz-Ladekabel und Powerbank dabei
-- [ ] Notfall-Kontaktnummer dem Standpersonal kommuniziert
+- [ ] 2026-08-26 **Zweiter DB-Wipe kurz vor Türöffnung.** Sequenz: CSV-Export nach
+      `backups/` → `DELETE FROM votes;` → Count-Check auf 0. Der Wipe vom 25.08. ist
+      durch, aber die iPad-Testvotes schreiben bis Messebeginn wieder Zeilen. Ohne
+      Point-in-Time-Recovery (Free-Plan, ADR 2026-08-24) ist der Export vorher Pflicht.
 
 ## Erledigt
 
 <!-- - [x] 2026-05-15 Beispiel-Task -->
+
+### Übergabe an Messebauer — 2026-08-24 per Mail geklärt
+
+Der Messebauer hat auf Anfrage bestätigt, dass das Setup abgedeckt ist. **Die
+Einzelpunkte unten wurden nicht von uns verifiziert** — sie stehen hier als
+Referenz, falls am Messetag doch etwas nachgeschlagen werden muss, nicht als
+erledigte Arbeit.
+
+**Setup iPad**
+
+- Anleitung: Safari → Teilen → Zum Home-Bildschirm (PWA-Installation)
+- iPad-Einstellungen: Auto-Lock «Nie», Lautstärke, Helligkeit, Benachrichtigungen aus, WLAN zum MiFi
+- Schriftarten / Sprache prüfen
+
+**Kiosk-Modus (Guided Access)**
+
+- Guided Access aktivieren (Einstellungen → Bedienungshilfen → Geführter Zugriff)
+- Code festlegen und dokumentieren
+- Bedienungselemente einschränken (Home, Lautstärke, Touchbereiche)
+- Test: Besucher kann App nicht verlassen
+
+**Fehler-Handling vor Ort**
+
+- Was tun bei rotem «Server nicht erreichbar»-Indikator?
+- Was tun bei eingefrorenem Bildschirm? (Guided Access aufheben, App neu starten)
+- Ansprechpartner am Messetag bei technischen Problemen definieren
+- Backup-iPad vorbereiten und identisch konfigurieren
+
+**Offline-Betrieb**
+
+- Queue-Limit dokumentieren: 500 Votes pro iPad, letzte Zahlen bleiben sichtbar
+- Verhalten bei aufgebrauchtem MiFi-Datenvolumen klären
+- Empfohlene Mindest-Bandbreite festhalten
+
+**Don'ts (Messepersonal)**
+
+- iPad nicht komplett ausschalten (Standby reicht)
+- Browser-/Website-Daten nicht löschen (Queue + Cache weg)
+- Während aktivem Vote kein Neustart
+- Keine anderen Apps während Messebetrieb
+- iPad nicht länger in Hintergrund (Wake Lock geht verloren)
+
+**Checkliste vor Messebeginn**
+
+- Alle iPads im selben WLAN
+- Alle iPads zeigen «Online»
+- Testvote auf jedem iPad → erscheint auf allen anderen
+- MiFi geladen und SIM-Datenvolumen aktiv
+- Ersatz-Ladekabel und Powerbank dabei
+- Notfall-Kontaktnummer dem Standpersonal kommuniziert
