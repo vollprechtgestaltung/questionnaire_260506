@@ -7,9 +7,9 @@ import { dirname, join } from 'node:path'
 
 export const projectRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-// Minimal .env reader. The project runs on Node 20.4, which has neither
-// --env-file (20.6+) nor process.loadEnvFile() (20.12+), so parse it here.
-// Drop this once the engines floor moves past 20.12.
+// Minimal .env reader. package.json allows Node >= 20, and neither
+// --env-file (20.6+) nor process.loadEnvFile() (20.12+) covers that whole
+// range, so parse it here. Drop this once the engines floor moves past 20.12.
 export function loadEnv(file = join(projectRoot, '.env')) {
   let raw
   try {

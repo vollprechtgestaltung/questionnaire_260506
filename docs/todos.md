@@ -92,12 +92,8 @@ History via Graft erhalten, Push manuell über VS Code.
 - [ ] 2026-08-26 **Snapshot nach Messeschluss**, bevor irgendwer etwas anfasst:
       `npm run snapshot -- --label=post-messe`. Das ist der Export, der die Daten des
       Messetags sichert — der einzige, den es von diesem Tag geben wird.
-- [ ] 2026-08-25 **Snapshot-Probelauf mit Testvotes.** 5–10 Votes durch die echte App
-      (nicht per SQL-Insert — nur so läuft submit-vote → Insert → Realtime mit),
-      dann `npm run health` → `npm run snapshot -- --label=probelauf --page-size=3`
-      → `DELETE FROM votes;` (braucht `service_role`, nicht den Anon-Key) →
-      `npm run health` muss 0 zeigen → Probelauf-CSV wieder löschen.
-      `--page-size=3` erzwingt den Mehrseiten-Pfad gegen echtes PostgREST.
+- [x] 2026-08-25 **Snapshot-Probelauf mit Testvotes** — durchgeführt, siehe
+      `## Erledigt`.
 
 ### Nach der Messe
 
@@ -111,6 +107,24 @@ History via Graft erhalten, Push manuell über VS Code.
 ## Erledigt
 
 <!-- - [x] 2026-05-15 Beispiel-Task -->
+
+### Snapshot-Probelauf — 2026-08-25
+
+9 Votes über die echte App gesetzt, dann beide Skripte gegen echte Daten
+verifiziert:
+
+- `npm run health` → 9 Zeilen, letzter Vote korrekt, `submit-vote` erreichbar.
+  Nebenbefund: PostgREST antwortet mit **206** statt 200, sobald ein `limit`
+  greift — der Check wertet den ganzen 2xx-Bereich, also kein Fehlalarm.
+- `npm run snapshot` einmal ohne und einmal mit `--page-size=3`. Beide CSVs
+  **byte-identisch** (9 Zeilen, 9 eindeutige IDs, im zweiten Lauf über 3 echte
+  `Range`-Requests). Damit ist die Annahme über die PostgREST-`Range`-Semantik
+  belegt — die Lücke, die Unit-Tests gegen einen Fake-Pager strukturell nicht
+  schliessen können.
+- `DELETE FROM votes;` via MCP (`service_role`; der Anon-Key hat kein DELETE)
+  → 9 gelöscht, Nachzählung 0.
+- Beide Probelauf-CSVs wieder gelöscht — Backups von Testdaten gehören nicht
+  neben die echten Exporte.
 
 ### Übergabe an Messebauer — 2026-08-24 per Mail geklärt
 
