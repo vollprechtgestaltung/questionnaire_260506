@@ -44,5 +44,15 @@ export default [
         fetch: 'readonly'
       }
     }
+  },
+  {
+    files: ['bin/**/*.js'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        fetch: 'readonly',
+        AbortSignal: 'readonly'
+      }
+    }
   }
 ]

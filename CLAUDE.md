@@ -16,7 +16,12 @@ Analytics-Integration.
 - `npm run dev` — Vite Dev-Server starten (localhost)
 - `npm run build` — Production-Build nach `dist/`
 - `npm run preview` — gebauten Build lokal vorschauen
-- `npm run test` — Vitest (Unit-Tests in `src/`)
+- `npm run test` — Vitest (Unit-Tests in `src/` und `bin/lib/`)
+- `npm run health` — Betriebs-Check: Supabase erreichbar, Vote-Count,
+  Edge Function. Schreibt nichts. Details: `docs/ops-tooling.md`.
+- `npm run snapshot -- --label=pre-wipe` — `votes` als CSV nach
+  `backups/`. **Pflicht vor jedem `DELETE` auf `votes`** (kein PITR im
+  Free-Plan). Bricht ab statt gekürzt zu schreiben.
 - `npm run lint` — ESLint (alle JS/Svelte-Dateien)
 - `npm run format` — Prettier (alle unterstützten Dateien)
 - `bash tests/hooks.sh` — Hook-Test-Suite. Pre-Commit ruft das

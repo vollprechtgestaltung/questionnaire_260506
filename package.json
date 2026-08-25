@@ -15,8 +15,10 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src/ api/",
-    "format": "prettier --write src/ api/"
+    "lint": "eslint src/ api/ bin/",
+    "format": "prettier --write src/ api/ bin/",
+    "health": "node bin/health-check.js",
+    "snapshot": "node bin/snapshot.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3"

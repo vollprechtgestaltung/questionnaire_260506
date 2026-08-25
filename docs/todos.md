@@ -83,10 +83,30 @@ History via Graft erhalten, Push manuell über VS Code.
 
 ### Messe 2026-08-26
 
-- [ ] 2026-08-26 **Zweiter DB-Wipe kurz vor Türöffnung.** Sequenz: CSV-Export nach
-      `backups/` → `DELETE FROM votes;` → Count-Check auf 0. Der Wipe vom 25.08. ist
-      durch, aber die iPad-Testvotes schreiben bis Messebeginn wieder Zeilen. Ohne
+- [ ] 2026-08-26 **Zweiter DB-Wipe kurz vor Türöffnung.** Sequenz:
+      `npm run snapshot -- --label=pre-wipe` → `DELETE FROM votes;` →
+      `npm run health` (Count muss 0 sein). Der Wipe vom 25.08. ist durch, aber die
+      iPad-Testvotes schreiben bis Messebeginn wieder Zeilen. Ohne
       Point-in-Time-Recovery (Free-Plan, ADR 2026-08-24) ist der Export vorher Pflicht.
+      Tooling: `docs/ops-tooling.md`.
+- [ ] 2026-08-26 **Snapshot nach Messeschluss**, bevor irgendwer etwas anfasst:
+      `npm run snapshot -- --label=post-messe`. Das ist der Export, der die Daten des
+      Messetags sichert — der einzige, den es von diesem Tag geben wird.
+- [ ] 2026-08-25 **Snapshot-Probelauf mit Testvotes.** 5–10 Votes durch die echte App
+      (nicht per SQL-Insert — nur so läuft submit-vote → Insert → Realtime mit),
+      dann `npm run health` → `npm run snapshot -- --label=probelauf --page-size=3`
+      → `DELETE FROM votes;` (braucht `service_role`, nicht den Anon-Key) →
+      `npm run health` muss 0 zeigen → Probelauf-CSV wieder löschen.
+      `--page-size=3` erzwingt den Mehrseiten-Pfad gegen echtes PostgREST.
+
+### Nach der Messe
+
+- [ ] **`TRUNCATE`-Privileg für `anon` auf `votes` prüfen.** `anon` hat kein
+      INSERT/UPDATE/DELETE, aber `TRUNCATE` — und RLS greift bei `TRUNCATE` nicht.
+      Über PostgREST nicht erreichbar (kein TRUNCATE-Endpoint), also kein akutes
+      Risiko über den öffentlichen Key. Trotzdem unnötig:
+      `REVOKE TRUNCATE ON public.votes FROM anon;`. Bewusst **nach** der Messe —
+      am Vortag nichts an Produktions-Grants ändern.
 
 ## Erledigt
 
