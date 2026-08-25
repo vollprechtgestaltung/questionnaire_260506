@@ -50,6 +50,17 @@ Regeln:
 - Negativ: Der Heartbeat wird damit zur kritischen Infrastruktur. Fällt der Vercel-Cron aus, pausiert das Projekt nach 7 Tagen Inaktivität. Vor längeren Pausen zwischen Einsätzen den Cron-Status prüfen.
 - Falls sich die Lage ändert (mehrtägiger Dauereinsatz, echte Besucherdaten mit Wiederherstellungsbedarf): neue ADR, diese hier auf `superseded` setzen.
 
+**Nachtrag 2026-08-25 — Pro hätte den genannten Nachteil gar nicht behoben.**
+
+Die Frage „einen Monat auf Pro, um ein Fallback zu haben?" kam erneut auf. Recherche in den Supabase-Docs ergab zwei Punkte, die oben fehlten und die Entscheidung *stärken* statt sie zu relativieren:
+
+- **PITR ist nicht Teil von Pro**, sondern ein separates, nutzungsbasiert abgerechnetes Add-on. Der oben als Free-Nachteil geführte Punkt „kein Point-in-Time-Recovery" wäre durch ein Pro-Upgrade also **nicht** verschwunden. Wer die Konsequenz oben liest, könnte das Gegenteil annehmen — daher dieser Nachtrag.
+- **Pro allein liefert tägliche Snapshots** (7 Tage Retention). Für einen Einzeltag-Einsatz ist das wirkungslos: das Backup entsteht zu einem nicht steuerbaren Zeitpunkt, der jüngste Snapshot stammt damit von vor Türöffnung, und ein Restore läge vor allen Votes des Tages.
+
+Entscheidend ist die Asymmetrie: Support und Ressourcen lassen sich **reaktiv** nachkaufen, ein Backup nicht — das existiert nur, wenn der Plan schon vor dem Verlust aktiv war. Genau dieses eine Argument für ein Vorab-Upgrade greift hier nicht.
+
+**Konsequenz:** Entscheidung unverändert `accepted`. Der CSV-Export vor jedem `DELETE` bleibt das einzige Backup — seit 2026-08-25 durch `npm run snapshot` abgesichert, das bei unvollständigem Export abbricht statt zu schreiben (siehe `docs/ops-tooling.md`). Ein künftiges Upgrade müsste mit Support oder Ressourcen begründet werden, nicht mit Datensicherheit.
+
 ---
 
 ## 2026-06-25 — Server-Rate-Limit entfernt, Dedup nur über UNIQUE id
