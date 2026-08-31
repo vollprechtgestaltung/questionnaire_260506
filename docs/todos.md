@@ -83,17 +83,31 @@ History via Graft erhalten, Push manuell über VS Code.
 
 ### Messe 2026-08-26
 
-- [ ] 2026-08-26 **Zweiter DB-Wipe kurz vor Türöffnung.** Sequenz:
-      `npm run snapshot -- --label=pre-wipe` → `DELETE FROM votes;` →
-      `npm run health` (Count muss 0 sein). Der Wipe vom 25.08. ist durch, aber die
-      iPad-Testvotes schreiben bis Messebeginn wieder Zeilen. Ohne
-      Point-in-Time-Recovery (Free-Plan, ADR 2026-08-24) ist der Export vorher Pflicht.
-      Tooling: `docs/ops-tooling.md`.
-- [ ] 2026-08-26 **Snapshot nach Messeschluss**, bevor irgendwer etwas anfasst:
-      `npm run snapshot -- --label=post-messe`. Das ist der Export, der die Daten des
-      Messetags sichert — der einzige, den es von diesem Tag geben wird.
+- [~] 2026-08-26 **Zweiter DB-Wipe kurz vor Türöffnung** — **nicht ausgeführt.**
+      Gegenstandslos: am Messetag ist ohnehin keine einzige Zeile in `votes`
+      gelandet. Siehe `docs/incident-2026-08-31-fehlende-messedaten.md`.
+- [x] 2026-08-31 **Snapshot nach Messeschluss** — 5 Tage verspätet nachgeholt:
+      `backups/votes-2026-08-31-0900-post-messe.csv`, **2 Zeilen** (27./28.08.,
+      dasselbe Gerät). **Aus dem Messetag 26.08. ist nichts enthalten.**
+      Befund und Beweisführung: `docs/incident-2026-08-31-fehlende-messedaten.md`.
 - [x] 2026-08-25 **Snapshot-Probelauf mit Testvotes** — durchgeführt, siehe
       `## Erledigt`.
+
+### Incident fehlende Messedaten — offen
+
+Voller Kontext: `docs/incident-2026-08-31-fehlende-messedaten.md`.
+
+- [ ] 2026-08-31 **Rückmeldung der Agentur einholen** zu den drei Fragen im
+      Incident-Doc: Zustand der iPads, seitheriger Online-Betrieb, ob am 26.08.
+      überhaupt abgestimmt wurde. Die bisherige Antwort „alles ok" ist mit dem
+      DB-Befund nicht vereinbar.
+- [ ] 2026-08-31 **Sperre bis zur Klärung:** auf den iPads keine Website-/
+      Browserdaten löschen, PWA nicht deinstallieren, Geräte nicht zurücksetzen;
+      an `votes` kein `DELETE`/`TRUNCATE`. Die Offline-Queue auf den Geräten ist
+      der einzige Ort, an dem Messedaten noch liegen können.
+- [x] 2026-08-31 **Post-Messe-CSV committen** — entschieden: mitcommitten,
+      konsistent mit dem getrackten CSV vom 24.08. Enthält keine
+      personenbezogenen Daten (uuid, int, uuid, timestamps).
 
 ### Nach der Messe
 
@@ -103,6 +117,8 @@ History via Graft erhalten, Push manuell über VS Code.
       Risiko über den öffentlichen Key. Trotzdem unnötig:
       `REVOKE TRUNCATE ON public.votes FROM anon;`. Bewusst **nach** der Messe —
       am Vortag nichts an Produktions-Grants ändern.
+      **Reine Hygiene, keine Spur:** im Incident vom 31.08. wurde ein `TRUNCATE`
+      als Ursache geprüft und ausgeschlossen.
 
 ## Erledigt
 
