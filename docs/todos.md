@@ -123,7 +123,10 @@ Entscheid: ADR 2026-09-07. Ablauf und Restore-Anleitung: `docs/archiv.md`.
 - [ ] **Nach Freigabe: Löschung ausführen** — Checkliste in `docs/archiv.md`.
       Reihenfolge: Count prüfen → Vercel-Projekt löschen (nimmt Cron mit) →
       Supabase-Projekt `zgqxmooimqhugszgreki` löschen → Datum eintragen.
-- [ ] **Git-Tag `archiv-2026-09-07`** auf den Archivstand setzen und pushen.
+- [ ] **Git-Tag setzen — erst bei der Löschung**, nicht vorher: der
+      Archivstand ist der letzte Commit *vor* dem Abbau, und bis dahin kommen
+      noch Session-Summaries dazu. Name dann nach Löschdatum, z. B.
+      `archiv-YYYY-MM-DD`. Push braucht einen Sandbox-Bypass.
 - [x] 2026-09-07 **`TRUNCATE`-Privileg für `anon`** — mit der Löschung
       gegenstandslos, entfällt ersatzlos. Als Kommentar in
       `docs/supabase-setup.sql` vermerkt, falls je wieder aufgebaut wird.
