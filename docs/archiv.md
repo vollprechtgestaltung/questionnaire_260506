@@ -4,9 +4,9 @@
 > App nach der Einmottung wieder aufgebaut werden soll, oder wenn jemand fragt,
 > wo der Stand des Projekts nach Abschluss liegt.
 
-**Status: Archiv vorbereitet und verifiziert am 2026-09-07. Die Online-Löschung
-steht noch aus** — Zeitpunkt ist mit der Agentur abzustimmen. Bis dahin bleibt
-alles unverändert online, inklusive Heartbeat-Cron.
+**Status: abgeschlossen am 2026-09-07.** Archiv verifiziert, Freigabe der
+Agentur eingeholt, Vercel- und Supabase-Projekt gelöscht. Ab hier existiert das
+Projekt nur noch in diesem Repository.
 
 ## Grundsatz
 
@@ -85,24 +85,39 @@ angefasst.
    scheitert jeder Vote an CORS.
 7. **Abnahme:** `npm run health -- --origin=https://<neue-domain>` — prüft
    Erreichbarkeit, Zeilen-Count und CORS-Preflight in einem Lauf.
+8. **Nur bei erneutem Live-Betrieb:** Uptime-Monitoring neu aufsetzen. Der
+   Endpoint dafür existiert weiterhin (`api/ping.js`, unauthentifiziert, gibt
+   `{ok:true}`) — bewusst getrennt vom `CRON_SECRET`-geschützten
+   `api/heartbeat.js`.
 
 Weiterführend: `docs/build-plan.md` (Aufbaureihenfolge der App),
 `docs/heartbeat.md` (Cron gegen Free-Tier-Pause), `docs/ops-tooling.md`.
 
-## Checkliste für die Löschung (offen, Termin via Agentur)
+## Abbau — ausgeführt 2026-09-07
 
-Erst ausführen, wenn der Termin bestätigt ist. Reihenfolge ist bewusst:
+1. [x] **Zeilen-Count final geprüft.** Live-Tabelle unverändert bei 2 Zeilen,
+       einem Gerät, identischen Zeitstempeln zur committeten CSV. Ein
+       Pre-Delete-Snapshot war damit nicht nötig.
+2. [x] **Vercel-Projekt gelöscht** — mitsamt Deployment, Domain und
+       Heartbeat-Cron.
+3. [x] **Supabase-Projekt gelöscht.**
+4. [ ] **UptimeRobot-Monitor löschen.** Zeigt auf `/api/ping` der nun
+       gelöschten Vercel-Domain und schlägt sonst dauerhaft Alarm. **Löschen,
+       nicht pausieren** — das Projekt kommt nicht zurück.
+5. [ ] **`.env` lokal verwerfen oder behalten** — die Keys sind wertlos.
+       Nicht ins Repo, in keinem Fall.
 
-1. [ ] **Letzter Blick auf den Zeilen-Count** (`npm run health`). Nur wenn er
-       weiterhin 2 zeigt, ist die committete CSV der vollständige Stand —
-       andernfalls vorher `npm run snapshot -- --label=pre-delete`.
-2. [ ] **Vercel-Projekt löschen.** Nimmt Deployment, Domain und Cron mit; der
-       Heartbeat muss dadurch nicht separat abgeschaltet werden.
-3. [ ] **Supabase-Projekt `zgqxmooimqhugszgreki` löschen.**
-4. [ ] **Löschdatum hier und in `docs/todos.md` eintragen**, Status oben auf
-       „abgeschlossen" setzen.
-5. [ ] **`.env` lokal behalten oder verwerfen** — die Keys sind nach der
-       Löschung wertlos. Nicht ins Repo, in keinem Fall.
+**Nachtrag zur Vollständigkeit:** Der Monitor ist beim Aufstellen der
+Checkliste übersehen worden. Er war nur im Session-Summary vom 2026-05-21
+dokumentiert, nicht in den TODOs. Lehre für den nächsten Abbau: nicht nur die
+eigenen Dienste aufzählen, sondern fragen, **was von aussen auf das Deployment
+zeigt** — Monitoring, Cron-Dienste, installierte PWAs auf fremden Geräten,
+geteilte Links.
+
+Weiterhin offen an fremder Stelle: **auf den iPads der Agentur ist die PWA
+installiert** und zeigt ab jetzt dauerhaft „Server nicht erreichbar". Falls die
+Geräte weiterverwendet werden, gehört sie dort entfernt — das liegt bei der
+Agentur.
 
 Nicht zu tun: Repo-Inhalte aufräumen, `backups/` löschen oder die Doku
 ausdünnen. Der Wert des Archivs liegt genau darin.

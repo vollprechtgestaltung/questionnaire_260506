@@ -17,4 +17,4 @@ Each entry: one line, ~150 chars max:
 - [Voting Design](project_voting_design.md) — Mehrere Votes pro Gerät gewollt (1 iPad, Kiosk-Rückfall nach 20s); kein Admin-UI geplant.
 - [Production Status](project_production_status.md) — App läuft am echten Messetag; „Prototyp" aus CLAUDE.md nicht als Qualitäts-Relativierung verwenden.
 - [Messe-Bilanz](project_messe_prep.md) — Messe 26.08. als Erhebung gescheitert: nur 2 Votes, Ursache Standbetrieb (unbedientes, dunkles iPad). Kein Datenverlust, Sperre aufgehoben.
-- [Archivierung](project_archivierung.md) — Supabase + Vercel werden gelöscht, Repo ist der Archivstand. Termin offen (Agentur) — nicht ungefragt löschen, Heartbeat bis dahin laufen lassen.
+- [Archivierung](project_archivierung.md) — Projekt seit 2026-09-07 abgebaut: Supabase + Vercel gelöscht, nur noch dieses Repo. Nichts mehr live prüfen.

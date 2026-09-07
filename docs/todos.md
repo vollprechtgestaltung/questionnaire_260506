@@ -119,14 +119,18 @@ Entscheid: ADR 2026-09-07. Ablauf und Restore-Anleitung: `docs/archiv.md`.
 - [x] 2026-09-07 **Archiv verifiziert.** Repo gegen Live-Projekt abgeglichen:
       Daten vollständig (2 Zeilen, CSV deckungsgleich), Edge Function ohne
       Drift, Schema-Lücke `voted_at` in `docs/supabase-setup.sql` geschlossen.
-- [ ] **Löschtermin mit der Agentur abstimmen.** Blockiert alles Weitere.
-- [ ] **Nach Freigabe: Löschung ausführen** — Checkliste in `docs/archiv.md`.
-      Reihenfolge: Count prüfen → Vercel-Projekt löschen (nimmt Cron mit) →
-      Supabase-Projekt `zgqxmooimqhugszgreki` löschen → Datum eintragen.
-- [ ] **Git-Tag setzen — erst bei der Löschung**, nicht vorher: der
-      Archivstand ist der letzte Commit *vor* dem Abbau, und bis dahin kommen
-      noch Session-Summaries dazu. Name dann nach Löschdatum, z. B.
-      `archiv-YYYY-MM-DD`. Push braucht einen Sandbox-Bypass.
+- [x] 2026-09-07 **Löschtermin abgestimmt** — Freigabe der Agentur erteilt.
+- [x] 2026-09-07 **Löschung ausgeführt.** Zeilen-Count final geprüft
+      (unverändert 2, kein Pre-Delete-Snapshot nötig), Vercel-Projekt gelöscht
+      (nahm den Heartbeat-Cron mit), Supabase-Projekt gelöscht.
+- [ ] **UptimeRobot-Monitor löschen.** Zeigt auf `/api/ping` der gelöschten
+      Vercel-Domain und schlägt sonst dauerhaft Alarm. Löschen, nicht
+      pausieren. War nur im Session-Summary vom 2026-05-21 dokumentiert und
+      fehlte deshalb in der Abbau-Checkliste.
+- [ ] **`.env` lokal verwerfen oder behalten** — Keys sind wertlos, gehören in
+      keinem Fall ins Repo.
+- [ ] **Bei der Agentur: PWA von den iPads entfernen**, falls die Geräte
+      weiterverwendet werden. Zeigt sonst dauerhaft „Server nicht erreichbar".
 - [x] 2026-09-07 **`TRUNCATE`-Privileg für `anon`** — mit der Löschung
       gegenstandslos, entfällt ersatzlos. Als Kommentar in
       `docs/supabase-setup.sql` vermerkt, falls je wieder aufgebaut wird.
