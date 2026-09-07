@@ -129,8 +129,8 @@ Entscheid: ADR 2026-09-07. Ablauf und Restore-Anleitung: `docs/archiv.md`.
 - [x] 2026-09-07 **Supabase-Account vollständig gelöscht**, nicht nur das
       Projekt. Account war leer (null Projekte, Free-Plan). Das Token der
       MCP-Anbindung wird damit von selbst ungültig.
-- [ ] **`.env` lokal verwerfen oder behalten** — Keys sind wertlos, gehören in
-      keinem Fall ins Repo.
+- [x] 2026-09-07 **`.env` bleibt lokal liegen.** Keys zeigen auf ein
+      gelöschtes Projekt, Datei ist gitignored — kein Risiko, kein Aufwand.
 - [ ] **Bei der Agentur: PWA von den iPads entfernen**, falls die Geräte
       weiterverwendet werden. Zeigt sonst dauerhaft „Server nicht erreichbar".
 - [x] 2026-09-07 **`TRUNCATE`-Privileg für `anon`** — mit der Löschung

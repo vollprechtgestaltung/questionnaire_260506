@@ -109,8 +109,10 @@ Weiterführend: `docs/build-plan.md` (Aufbaureihenfolge der App),
        (null Projekte, Free-Plan). Damit ist auch das Personal Access Token
        der MCP-Anbindung erledigt, das mit dem Account ungültig wird.
        Konsequenz: ein Wiederaufbau beginnt mit der Account-Anlage.
-6. [ ] **`.env` lokal verwerfen oder behalten** — die Keys sind wertlos.
-       Nicht ins Repo, in keinem Fall.
+6. [x] **`.env` bleibt lokal liegen** — Entscheid des Users. URL und Anon-Key
+       zeigen auf ein gelöschtes Projekt, laufen also ins Leere; die Datei ist
+       gitignored und verlässt das Arbeitsverzeichnis nicht. Kein Risiko, kein
+       Aufräumbedarf.
 
 **Nachtrag zur Vollständigkeit:** Der Monitor ist beim Aufstellen der
 Checkliste übersehen worden. Er war nur im Session-Summary vom 2026-05-21
