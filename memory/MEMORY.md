@@ -16,4 +16,5 @@ Each entry: one line, ~150 chars max:
 - [Kein ungefragter Branch](feedback_no_unprompted_branch.md) — Bei "commit + push" auf den aktuellen Branch (main) committen; Branch nur auf explizite Anweisung.
 - [Voting Design](project_voting_design.md) — Mehrere Votes pro Gerät gewollt (1 iPad, Kiosk-Rückfall nach 20s); kein Admin-UI geplant.
 - [Production Status](project_production_status.md) — App läuft am echten Messetag; „Prototyp" aus CLAUDE.md nicht als Qualitäts-Relativierung verwenden.
-- [Messe-Prep](project_messe_prep.md) — Messe 26.08. vorbei; kein einziger Vote aus dem Messetag in der DB, Incident offen. iPads nicht zurücksetzen, `votes` nicht anfassen.
+- [Messe-Bilanz](project_messe_prep.md) — Messe 26.08. als Erhebung gescheitert: nur 2 Votes, Ursache Standbetrieb (unbedientes, dunkles iPad). Kein Datenverlust, Sperre aufgehoben.
+- [Archivierung](project_archivierung.md) — Supabase + Vercel werden gelöscht, Repo ist der Archivstand. Termin offen (Agentur) — nicht ungefragt löschen, Heartbeat bis dahin laufen lassen.

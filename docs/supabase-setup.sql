@@ -6,7 +6,12 @@ CREATE TABLE IF NOT EXISTS votes (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   option     smallint NOT NULL CHECK (option BETWEEN 1 AND 4),
   device_id  text NOT NULL,
-  created_at timestamptz NOT NULL DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+  -- Time the vote was cast on the device, as opposed to created_at (arrival in
+  -- the DB). The two differ for votes that sat in the offline queue. Added
+  -- after initial rollout, hence nullable: queue entries written before the
+  -- change carry no voted_at. Set by submit-vote, never by the client directly.
+  voted_at   timestamptz
 );
 
 -- 2. Row Level Security
@@ -26,6 +31,12 @@ CREATE POLICY "allow select" ON votes
 
 -- 3. Grant read-only privileges to the anon role
 GRANT SELECT ON votes TO anon;
+
+-- Note (verified against the live DB 2026-09-07): anon additionally holds
+-- TRUNCATE, REFERENCES and TRIGGER on votes. Those are not granted here — they
+-- come from Supabase's default privileges on the public schema and reappear on
+-- a rebuilt project. Not reachable through PostgREST, so no acute risk; to be
+-- tidy, add: REVOKE TRUNCATE ON public.votes FROM anon;
 
 -- 4. Aggregation function — returns vote counts per option
 -- Avoids fetching all rows on the client; only totals are transferred

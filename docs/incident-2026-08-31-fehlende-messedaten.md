@@ -1,12 +1,13 @@
 # Incident 2026-08-31 — keine Messedaten vom 26.08. in `votes`
 
-> When to read: wenn es um die Vote-Daten des Messetags 2026-08-26 geht,
-> um den Zustand der iPads danach, oder bevor irgendjemand `votes` leert
-> bzw. die Offline-Queue auf einem iPad verwirft. Auch lesen, bevor die
-> Zähler in `pg_stat_user_tables` erneut als Beleg herangezogen werden.
+> When to read: wenn es um die Vote-Daten des Messetags 2026-08-26 geht oder
+> wenn jemand erneut vermutet, an der Datenbank sei etwas gelöscht worden.
+> Auch lesen, bevor die Zähler in `pg_stat_user_tables` als Beleg herangezogen
+> werden, und vor der Planung des nächsten Vor-Ort-Einsatzes.
 
-**Status: offen.** Der technische Teil ist geklärt, der organisatorische
-nicht. Es fehlt die Rückmeldung, was am Messetag tatsächlich passiert ist.
+**Status: abgeschlossen am 2026-09-07.** Es sind keine Daten verloren gegangen.
+Am Messetag wurde schlicht nicht abgestimmt — die App war nicht das Problem,
+der Stand war es.
 
 ## Kurzfassung
 
@@ -15,8 +16,10 @@ Der Post-Messe-Snapshot am 31.08. förderte **2 Zeilen** zutage, beide vom
 einzige Zeile in `votes`.**
 
 Die Postgres-Zähler belegen: die Daten wurden **nicht gelöscht — sie sind nie
-angekommen.** Damit sind die iPads der einzige Ort, an dem sie noch existieren
-können (Offline-Queue in `localStorage`, `puls_vote_queue`, Limit 500/Gerät).
+angekommen.** Die Auflösung am 07.09. zeigt warum: es wurden nie welche
+abgesetzt. Insgesamt sind über die gesamte Standzeit **2 Votes** abgegeben
+worden, und genau diese 2 liegen in der Datenbank. **Die Datenbank ist
+vollständig.**
 
 ## Messwerte (erhoben 2026-08-31, ~09:00 CEST)
 
@@ -89,25 +92,49 @@ bleibt sinnvoll, aber als Hygiene — nicht als Spur in diesem Vorgang.
 Merkposten für später: `n_tup_ins` ist bei diesem Schema **kein** Zähler für
 angenommene Votes. Wer Votes zählen will, zählt Zeilen.
 
-## Bis zur Klärung gilt
+## Auflösung (2026-09-07)
 
-- **Auf den iPads keine Website-/Browserdaten löschen**, PWA nicht
-  deinstallieren, Geräte nicht zurücksetzen. Falls dort eine Queue liegt, ist
-  das der einzige verbliebene Ort der Messedaten.
-- **An `votes` nichts ausführen** — kein `DELETE`, kein `TRUNCATE`.
-- Ein iPad kurz online mit geöffneter App würde die Queue flushen. Das ist der
-  gewünschte Weg der Rettung, aber erst nach Absprache — vorher festhalten,
-  was auf dem Gerät liegt.
+Frage 3 der offenen Fragen war die richtige: **am Messetag wurde nicht
+abgestimmt.** Über die gesamte Standzeit kamen **2 Votes** zusammen — dieselben
+2, die in der Datenbank liegen.
 
-## Offene Fragen an die Agentur
+Gründe laut Auftraggeber:
 
-1. **Sind die iPads noch im Zustand vom Messetag?** Nicht zurückgesetzt, PWA
-   nicht deinstalliert, Website-Daten nicht gelöscht?
-2. **Wurden sie seither online mit geöffneter App betrieben?** Wenn ja, hätte
-   die Queue geflusht — in der DB ist aber nichts angekommen. Das grenzt weiter
-   ein.
-3. **Wurde am 26.08. überhaupt über die iPads abgestimmt?** Wenn nein, ist
-   nichts verloren und die Frage ist eine andere.
+- **Die App wurde vom Standpersonal nicht bedient.** Niemand hat Besucher
+  aktiv an das iPad geführt.
+- **Das iPad stand dunkel** — Display aus oder abgedunkelt, also als
+  Interaktionsangebot nicht erkennbar.
+- **Die Positionierung am Stand war schlecht** — kein Blickfang, nicht im
+  Laufweg.
+
+Damit ist der technische Verdacht vollständig ausgeräumt: keine verlorene
+Queue, kein fehlgeschlagener Sync, kein DB-Eingriff. Die Erfassungskette hat
+funktioniert; es gab nichts zu erfassen.
+
+**Die Sperre vom 31.08. ist aufgehoben.** Die iPads dürfen zurückgesetzt, die
+PWA deinstalliert und Website-Daten gelöscht werden — auf den Geräten liegt
+nichts Rettbares. `DELETE`/`TRUNCATE` auf `votes` ist wieder zulässig, weiterhin
+**nur nach `npm run snapshot`** (siehe `docs/ops-tooling.md`; kein PITR im
+Free-Plan).
+
+## Einordnung — nicht im Verantwortungsbereich der Umsetzung
+
+Der Fehlschlag liegt ausserhalb dessen, was von hier aus steuerbar war:
+
+- **Die Position des iPads war vorgegeben.** Es stand in Kombination mit einem
+  Simulator; auch der wurde am Stand nicht gut angenommen. Der Standort war
+  keine Entscheidung der Umsetzung.
+- **Die Instruktion des Standpersonals liegt bei der Agentur bzw. beim
+  Kunden.** Ob Besucher aktiv an das Gerät geführt werden, wird vor Ort
+  entschieden, nicht in der App.
+- **Die Datenbank wurde an den Messetagen kontrolliert.** Dass keine Votes
+  eingingen, war bekannt und wurde der Agentur gemeldet. Eine Eskalation über
+  diese Meldung hinaus fand bewusst nicht statt — mehr war von hier aus nicht
+  zu tun.
+
+Festzuhalten bleibt allein: **die technische Kette hat getragen.** PWA, Queue,
+Edge Function und Datenbank haben funktioniert, die Erhebung ist am Standbetrieb
+gescheitert. Für die Bewertung des Auftrags ist das der relevante Satz.
 
 ## Verlauf
 
@@ -117,6 +144,9 @@ angenommene Votes. Wer Votes zählen will, zählt Zeilen.
 - **2026-08-31** — Post-Messe-Snapshot nachgeholt: 2 Zeilen. Befund an den
   Auftraggeber gemeldet; Rückmeldung der Agentur „alles ok", laut Auskunft
   ohne Rücksprache mit dem Endkunden. Analyse der Zähler → dieser Eintrag.
+- **2026-09-07** — Auflösung: insgesamt nur 2 Votes abgegeben, die App wurde
+  vom Standpersonal nicht bedient, das iPad stand dunkel und schlecht
+  positioniert. Kein Datenverlust, Sperre aufgehoben, Incident geschlossen.
 
 ## Bezüge
 

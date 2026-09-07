@@ -33,6 +33,27 @@ Regeln:
 
 ---
 
+## 2026-09-07 — Archivierung: Online-Instanzen werden gelöscht, das Repo ist der Archivstand
+
+**Status:** accepted
+
+**Kontext:** Der Einsatz ist abgeschlossen (Messe 2026-08-26, Bilanz in `docs/incident-2026-08-31-fehlende-messedaten.md`). Supabase droht das Free-Tier-Projekt wegen Inaktivität zu pausieren. Zur Wahl standen: pausieren lassen (Reaktivierung per Klick, URL und Keys bleiben) oder Supabase- und Vercel-Projekt löschen.
+
+**Entscheidung:** Beide Online-Instanzen werden gelöscht. Das Git-Repository ist der alleinige Archivstand. Der Löschzeitpunkt wird mit der Agentur abgestimmt; bis dahin bleibt der Betrieb inklusive Heartbeat unverändert.
+
+**Begründung:** In der Datenbank liegt nichts, was nicht auch im Repo liegt — 2 Vote-Zeilen, als CSV committet und am 07.09. gegen die Live-DB abgeglichen. Damit ist „pausieren" kein Sicherheitsgewinn, sondern nur eine offene Position in zwei fremden Accounts, deren Aufbewahrungsregeln für pausierte Free-Projekte wir nicht kontrollieren. Ein Archiv, dessen Wiederherstellbarkeit von der Kulanz eines Anbieters abhängt, ist keines. Der Preis der Löschung ist bekannt und begrenzt: neue URL, neue Keys, neue Domain — abgearbeitet in der Restore-Anleitung.
+
+**Konsequenzen:**
+
+- (+) Kein Restbestand in fremden Accounts, sauberer Projektabschluss auch datenschutzseitig (Zweck weggefallen).
+- (+) Der Wiederaufbau ist dokumentiert und geprüft statt angenommen — die Verifikation vor der Löschung hat eine echte Lücke im Schema-Skript gefunden (fehlende Spalte `voted_at`), die einen Restore hätte scheitern lassen.
+- (−) Wiederinbetriebnahme kostet Aufwand statt eines Klicks: neues Supabase-Projekt, Schema, Import, Function-Deploy, Vercel-Import, `ALLOWED_ORIGIN` nachziehen. Ablauf in `docs/archiv.md`.
+- (−) Die Domain `questionnaire-260506.vercel.app` ist nach der Löschung nicht reserviert. Bestehende Links und die im Function-Quelltext hinterlegte Default-Origin verlieren ihre Gültigkeit.
+- (!) **Der Heartbeat wird erst mit dem Vercel-Projekt entfernt, nicht vorher.** Ein früheres Abschalten liesse die DB pausieren, die vor dem Löschen erst wieder reaktiviert werden müsste. Kehrt die Konsequenz aus ADR 2026-08-24 um, wo er als kritische Infrastruktur geführt wird.
+- Der offene Punkt `REVOKE TRUNCATE ON public.votes FROM anon;` wird mit der Löschung gegenstandslos und entfällt ersatzlos. Für einen Wiederaufbau ist er als Kommentar in `docs/supabase-setup.sql` vermerkt.
+
+---
+
 ## 2026-08-24 — Supabase bleibt im Free-Plan, kein Pro-Upgrade
 
 **Status:** accepted

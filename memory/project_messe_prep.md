@@ -1,31 +1,41 @@
 ---
 name: project_messe_prep
-description: Messe 2026-08-26 ist vorbei; aus dem Messetag liegt kein einziger Vote in der DB — Incident offen. Supabase bleibt bewusst Free.
+description: Messe 2026-08-26 gelaufen und als Erhebung gescheitert — nur 2 Votes insgesamt, Ursache Standbetrieb, nicht Technik. Kein Datenverlust.
 metadata:
   type: project
 ---
 
-Die Messe war am **2026-08-26**. **Aus diesem Tag liegt keine einzige Zeile in
-`votes`.** Nachgewiesen am 31.08.: nicht gelöscht, sondern nie angekommen — die
-Postgres-Zähler schliessen ein gelöschtes Messetag-Volumen aus. Der Vorgang ist
-**offen**, voller Kontext in `docs/incident-2026-08-31-fehlende-messedaten.md`.
+Die Messe war am **2026-08-26**. Sie hat als Datenerhebung **nicht
+funktioniert**: über die gesamte Standzeit kamen **2 Votes** zusammen, und
+genau diese 2 liegen in `votes`. Am Messetag selbst wurde gar nicht
+abgestimmt.
 
-**Why:** Ohne diesen Stand liest die nächste Session die alte Vor-Messe-Checkliste
-als aktuellen Plan und hält die Daten für gesichert. Sind sie nicht.
+**Ursache ist der Standbetrieb, nicht die App:** das Standpersonal hat die App
+nicht bedient, das iPad stand dunkel und schlecht positioniert. Die
+Erfassungskette (PWA → Queue → Edge Function → DB) hat funktioniert; es gab
+nichts zu erfassen. Der Incident vom 31.08. ist damit am **07.09. geschlossen**,
+voller Verlauf in `docs/incident-2026-08-31-fehlende-messedaten.md`.
+
+**Why:** Zwischen dem 31.08. und dem 07.09. galt der Vorgang als möglicher
+Datenverlust, inklusive Sperre auf iPads und `votes`. Ohne diesen Stand wird
+die Sperre erneut angenommen oder die App als fehlerhaft verdächtigt.
 
 **How to apply:**
 
-- **Nicht als erledigt behandeln.** Bis die Agentur zu den drei Fragen im
-  Incident-Doc geantwortet hat (Zustand der iPads, seitheriger Online-Betrieb, ob
-  am 26.08. überhaupt abgestimmt wurde), gilt: auf den iPads keine Website-Daten
-  löschen, PWA nicht deinstallieren, Geräte nicht zurücksetzen; an `votes` kein
-  `DELETE`/`TRUNCATE`. Die Offline-Queue auf den Geräten ist der einzige Ort, an
-  dem Messedaten noch liegen können.
-- **Die erste Rückmeldung der Agentur war „alles ok"** — mit dem DB-Befund nicht
-  vereinbar. Aussagen zum Messebetrieb nicht ungeprüft übernehmen.
-- **Kein Supabase-Pro-Upgrade.** Entscheid User 2026-08-24, am 25.08. bestätigt:
-  PITR ist ein separates Add-on, Pro hätte das Backup-Problem gar nicht gelöst.
-  Konsequenz: der CSV-Export vor jedem `DELETE` ist das einzige Backup.
+- **Kein Datenverlust, keine Sperre mehr.** iPads dürfen zurückgesetzt werden,
+  `DELETE`/`TRUNCATE` auf `votes` ist wieder zulässig — weiterhin **nur nach
+  `npm run snapshot`** (kein PITR im Free-Plan).
+- **Die App nicht als Ursache verdächtigen.** Wer bei „keine Daten vom
+  Messetag" wieder an Queue, Sync oder DB-Eingriff denkt: das ist geprüft und
+  ausgeschlossen.
+- **Den Fehlschlag nicht der Umsetzung zurechnen.** Die Position des iPads war
+  vorgegeben (in Kombination mit einem Simulator, der ebenfalls schlecht
+  angenommen wurde), die Instruktion des Standpersonals liegt bei Agentur bzw.
+  Kunde. Die DB wurde an den Messetagen kontrolliert und die Agentur informiert
+  — mehr war von hier aus nicht zu tun.
+- **Kein Supabase-Pro-Upgrade.** Entscheid User 2026-08-24, am 25.08.
+  bestätigt: PITR ist ein separates Add-on, Pro hätte das Backup-Problem gar
+  nicht gelöst.
 - **`n_tup_ins` ist kein Vote-Zähler.** PK-Kollisionen aus der Offline-Queue
   zählen mit (client-generierte `id` + `votes_pkey`). Wer Votes zählt, zählt
   Zeilen. Diese Verwechslung hat am 31.08. einmal zu einer falschen

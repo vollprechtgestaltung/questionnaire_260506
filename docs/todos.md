@@ -83,9 +83,10 @@ History via Graft erhalten, Push manuell über VS Code.
 
 ### Messe 2026-08-26
 
-- [~] 2026-08-26 **Zweiter DB-Wipe kurz vor Türöffnung** — **nicht ausgeführt.**
+- [x] 2026-08-26 **Zweiter DB-Wipe kurz vor Türöffnung** — **nicht ausgeführt.**
       Gegenstandslos: am Messetag ist ohnehin keine einzige Zeile in `votes`
-      gelandet. Siehe `docs/incident-2026-08-31-fehlende-messedaten.md`.
+      gelandet, weil nicht abgestimmt wurde. Siehe
+      `docs/incident-2026-08-31-fehlende-messedaten.md`.
 - [x] 2026-08-31 **Snapshot nach Messeschluss** — 5 Tage verspätet nachgeholt:
       `backups/votes-2026-08-31-0900-post-messe.csv`, **2 Zeilen** (27./28.08.,
       dasselbe Gerät). **Aus dem Messetag 26.08. ist nichts enthalten.**
@@ -93,32 +94,45 @@ History via Graft erhalten, Push manuell über VS Code.
 - [x] 2026-08-25 **Snapshot-Probelauf mit Testvotes** — durchgeführt, siehe
       `## Erledigt`.
 
-### Incident fehlende Messedaten — offen
+### Incident fehlende Messedaten — geschlossen 2026-09-07
 
 Voller Kontext: `docs/incident-2026-08-31-fehlende-messedaten.md`.
 
-- [ ] 2026-08-31 **Rückmeldung der Agentur einholen** zu den drei Fragen im
-      Incident-Doc: Zustand der iPads, seitheriger Online-Betrieb, ob am 26.08.
-      überhaupt abgestimmt wurde. Die bisherige Antwort „alles ok" ist mit dem
-      DB-Befund nicht vereinbar.
-- [ ] 2026-08-31 **Sperre bis zur Klärung:** auf den iPads keine Website-/
-      Browserdaten löschen, PWA nicht deinstallieren, Geräte nicht zurücksetzen;
-      an `votes` kein `DELETE`/`TRUNCATE`. Die Offline-Queue auf den Geräten ist
-      der einzige Ort, an dem Messedaten noch liegen können.
+**Ergebnis: kein Datenverlust.** Insgesamt wurden nur 2 Votes abgegeben, und
+genau die liegen in der DB. Am Messetag wurde nicht abgestimmt — die App wurde
+vom Standpersonal nicht bedient, das iPad stand dunkel und schlecht
+positioniert.
+
+- [x] 2026-09-07 **Rückmeldung eingeholt** — Frage 3 war die richtige: am
+      26.08. wurde über die iPads gar nicht abgestimmt.
+- [x] 2026-09-07 **Sperre aufgehoben.** iPads dürfen zurückgesetzt werden,
+      `DELETE`/`TRUNCATE` auf `votes` wieder zulässig — weiterhin nur nach
+      `npm run snapshot`.
 - [x] 2026-08-31 **Post-Messe-CSV committen** — entschieden: mitcommitten,
       konsistent mit dem getrackten CSV vom 24.08. Enthält keine
       personenbezogenen Daten (uuid, int, uuid, timestamps).
 
-### Nach der Messe
+### Archivierung / Projektabschluss
 
-- [ ] **`TRUNCATE`-Privileg für `anon` auf `votes` prüfen.** `anon` hat kein
-      INSERT/UPDATE/DELETE, aber `TRUNCATE` — und RLS greift bei `TRUNCATE` nicht.
-      Über PostgREST nicht erreichbar (kein TRUNCATE-Endpoint), also kein akutes
-      Risiko über den öffentlichen Key. Trotzdem unnötig:
-      `REVOKE TRUNCATE ON public.votes FROM anon;`. Bewusst **nach** der Messe —
-      am Vortag nichts an Produktions-Grants ändern.
-      **Reine Hygiene, keine Spur:** im Incident vom 31.08. wurde ein `TRUNCATE`
-      als Ursache geprüft und ausgeschlossen.
+Entscheid: ADR 2026-09-07. Ablauf und Restore-Anleitung: `docs/archiv.md`.
+
+- [x] 2026-09-07 **Archiv verifiziert.** Repo gegen Live-Projekt abgeglichen:
+      Daten vollständig (2 Zeilen, CSV deckungsgleich), Edge Function ohne
+      Drift, Schema-Lücke `voted_at` in `docs/supabase-setup.sql` geschlossen.
+- [ ] **Löschtermin mit der Agentur abstimmen.** Blockiert alles Weitere.
+- [ ] **Nach Freigabe: Löschung ausführen** — Checkliste in `docs/archiv.md`.
+      Reihenfolge: Count prüfen → Vercel-Projekt löschen (nimmt Cron mit) →
+      Supabase-Projekt `zgqxmooimqhugszgreki` löschen → Datum eintragen.
+- [ ] **Git-Tag `archiv-2026-09-07`** auf den Archivstand setzen und pushen.
+- [x] 2026-09-07 **`TRUNCATE`-Privileg für `anon`** — mit der Löschung
+      gegenstandslos, entfällt ersatzlos. Als Kommentar in
+      `docs/supabase-setup.sql` vermerkt, falls je wieder aufgebaut wird.
+      War ohnehin nur Hygiene: im Incident vom 31.08. als Ursache geprüft und
+      ausgeschlossen.
+
+**Bis zur Löschung nicht anfassen:** Heartbeat-Cron in `vercel.json` läuft
+weiter. Abschalten liesse die DB pausieren, die vor dem Löschen erst wieder
+reaktiviert werden müsste.
 
 ## Erledigt
 
