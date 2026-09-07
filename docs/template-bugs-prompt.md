@@ -1,11 +1,14 @@
-# Prompt: Drei Template-Bugs zurückspielen (`_template-base-002`)
+# Rückflüsse ins Template (`_template-base-002`)
 
-> When to read: wenn die nächste Session im Template-Projekt `_template-base-002` startet und die hier dokumentierten Bugs gefixt werden sollen.
+> When to read: wenn die nächste Session im Template-Projekt `_template-base-002` startet und die hier gesammelten Rückflüsse eingearbeitet werden sollen.
 
-Diesen Prompt **wörtlich** in einer neuen Session im Template-Repo
-verwenden. Die Bugs wurden im Projekt `pls-INC006-questionaire`
-(Session 2026-05-20-1458) entdeckt und dort bereits gefixt — hier
-folgt der Rückfluss ins Template.
+Zwei Teile, unabhängig voneinander abarbeitbar:
+
+1. **Drei CI-Bugs** (unten als wörtlich kopierbarer Prompt) — entdeckt im
+   Projekt `pls-INC006-questionaire`, Session 2026-05-20-1458, dort bereits
+   gefixt.
+2. **Eine fehlende Konvention** (`## Zusatz 2026-09-07`) — kein Bug, sondern
+   eine Lücke, die erst beim Abbau desselben Projekts sichtbar wurde.
 
 ---
 
@@ -115,6 +118,51 @@ v1.4.2 — CI portability fixes
 Wenn `.template-manifest` versioniert ist: Version auf `v1.4.2`
 heben, Manifest und `.template-baseline/` neu generieren.
 
+## Zusatz 2026-09-07 — dem Template fehlt eine Abbau-Konvention
+
+Kein Bug. Das Template regelt Aufsetzen und Betrieb sauber, sagt aber nichts
+darüber, wie ein Projekt **aufhört**. Beim Abbau von `pls-INC006-questionaire`
+sind daraus zwei Fehler entstanden, von denen einer nur durch Zufall auffiel.
+
+**Beobachtung 1 — die Abbau-Liste zählt die falsche Menge auf.** Ich hatte
+sauber aufgelistet, *was wir betreiben* (Supabase, Vercel) und beides abgebaut.
+Übersehen wurde ein UptimeRobot-Monitor, der auf einen Health-Endpoint des
+Deployments zeigte und nach der Löschung dauerhaft Alarm geschlagen hätte. Er
+war nur in einem vier Monate alten Session-Summary dokumentiert, nie in den
+TODOs. Der User musste ihn erinnern.
+
+Die richtige Frage ist nicht „welche Dienste betreiben wir?", sondern **„was
+zeigt von aussen auf das Deployment?"** — Monitoring, externe Cron-/Ping-
+Dienste, installierte PWAs auf fremden Geräten, geteilte Links, DNS-Einträge,
+Webhooks. Das ist die Menge, die man beim Abbau abhaken muss.
+
+**Beobachtung 2 — Setup-Skripte driften still.** Das `supabase-setup.sql` des
+Projekts wich vom Live-Schema ab (eine Spalte fehlte, per Migration ergänzt und
+nie zurückgeschrieben). Vier Monate unbemerkt, weil nie jemand aus dem Skript
+neu aufgebaut hat. Wäre die Instanz vor der Prüfung gelöscht worden, hätte das
+niemand mehr feststellen können — der Fehler wäre erst beim Wiederaufbau
+aufgetaucht, ohne Referenz zum Abgleich.
+
+Daraus: **Wer eine laufende Instanz abbaut, prüft vorher das Rekonstruktions-
+Material gegen die Realität.** Danach ist die Referenz weg.
+
+**Vorschlag für das Template**
+
+- Eine `docs/archiv.md` als Template-File mit `> When to read:`-Trigger,
+  analog zu `docs/loeschkonzept.md`. Inhalt: Verifikation vor dem Abbau
+  (Daten, deployter Code vs. Repo, Schema-Skript vs. Live-Schema), die
+  Frage „was zeigt von aussen darauf?", eine Abbau-Reihenfolge und eine
+  Restore-Anleitung.
+- Ergänzung in `CLAUDE.md` unter `## Workflow` in der Trigger-Tabelle:
+  „Projekt abbauen / archivieren / Dienst abschalten → `docs/archiv.md`".
+- Optional in `docs/persistence.md` oder im Session-Summary-README: **externe
+  Dienste gehören bei der Einrichtung in `docs/todos.md`**, nicht nur in den
+  Summary des Tages. Ein Summary ist ein Anker, kein Inventar — der
+  SessionStart-Hook injiziert nur den jüngsten.
+
+Die ausformulierte Fassung aus dem Projekt liegt in dessen `docs/archiv.md`
+und kann als Vorlage dienen.
+
 ## Quellen
 
 - Projekt-Commits, die die Fixes enthalten (in `pls-INC006-questionaire`):
@@ -123,3 +171,5 @@ heben, Manifest und `.template-baseline/` neu generieren.
   - `79bb3157` — portable 'N minutes ago' in test suite
 - Session-Summary: `docs/sessions/2026-05-20-1458.md`
 - Memory: `memory/feedback_ci_debugging.md`
+- Zum Zusatz: `docs/archiv.md`, Session-Summary `docs/sessions/2026-09-07-0930.md`,
+  Memory `memory/project_archivierung.md` (alle in `pls-INC006-questionaire`)
