@@ -8,9 +8,10 @@ metadata:
 Das Projekt ist **archiviert und abgebaut, Stand 2026-09-07**. Entscheid als
 ADR in `docs/decisions.md`, Ablauf und Restore-Anleitung in `docs/archiv.md`.
 
-**Supabase- und Vercel-Projekt sind gelöscht** (nicht pausiert). **Das
-Git-Repository ist der alleinige Archivstand.** Es gibt keine laufende
-Instanz, keine erreichbare URL, keine Datenbank mehr.
+**Vercel-Projekt und der komplette Supabase-Account sind gelöscht** (nicht
+pausiert) — samt UptimeRobot-Monitor. **Das Git-Repository ist der alleinige
+Archivstand.** Es gibt keine laufende Instanz, keine erreichbare URL, keine
+Datenbank, und auch keine Supabase-MCP-Anbindung mehr.
 
 **Why:** Ohne diesen Stand versucht eine spätere Session, gegen ein
 Supabase-Projekt zu prüfen, das es nicht mehr gibt — oder hält den Betrieb für

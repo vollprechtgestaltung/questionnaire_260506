@@ -123,10 +123,12 @@ Entscheid: ADR 2026-09-07. Ablauf und Restore-Anleitung: `docs/archiv.md`.
 - [x] 2026-09-07 **Löschung ausgeführt.** Zeilen-Count final geprüft
       (unverändert 2, kein Pre-Delete-Snapshot nötig), Vercel-Projekt gelöscht
       (nahm den Heartbeat-Cron mit), Supabase-Projekt gelöscht.
-- [ ] **UptimeRobot-Monitor löschen.** Zeigt auf `/api/ping` der gelöschten
-      Vercel-Domain und schlägt sonst dauerhaft Alarm. Löschen, nicht
-      pausieren. War nur im Session-Summary vom 2026-05-21 dokumentiert und
-      fehlte deshalb in der Abbau-Checkliste.
+- [x] 2026-09-07 **UptimeRobot-Monitor gelöscht.** War nur im Session-Summary
+      vom 2026-05-21 dokumentiert und fehlte deshalb in der Abbau-Checkliste —
+      der User hat ihn erinnert.
+- [x] 2026-09-07 **Supabase-Account vollständig gelöscht**, nicht nur das
+      Projekt. Account war leer (null Projekte, Free-Plan). Das Token der
+      MCP-Anbindung wird damit von selbst ungültig.
 - [ ] **`.env` lokal verwerfen oder behalten** — Keys sind wertlos, gehören in
       keinem Fall ins Repo.
 - [ ] **Bei der Agentur: PWA von den iPads entfernen**, falls die Geräte

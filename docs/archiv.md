@@ -69,8 +69,9 @@ angefasst.
 1. **Repo auschecken**, Tag `archiv-2026-09-07` (Stand bei Einmottung).
    `npm install`, `npm run test`, `npm run build` als Funktionsnachweis —
    läuft ohne Backend.
-2. **Neues Supabase-Projekt** anlegen. Ursprung zum Vergleich: Region
-   `eu-west-3`, Postgres 17.
+2. **Supabase-Account und -Projekt neu anlegen.** Nicht nur das Projekt wurde
+   gelöscht, sondern der ganze Account (siehe Abbau unten) — ein Wiederaufbau
+   beginnt bei null. Ursprung zum Vergleich: Region `eu-west-3`, Postgres 17.
 3. **Schema aufsetzen:** `docs/supabase-setup.sql` vollständig im SQL Editor
    ausführen.
 4. **Daten importieren** (nur falls die historischen Votes gebraucht werden):
@@ -101,10 +102,14 @@ Weiterführend: `docs/build-plan.md` (Aufbaureihenfolge der App),
 2. [x] **Vercel-Projekt gelöscht** — mitsamt Deployment, Domain und
        Heartbeat-Cron.
 3. [x] **Supabase-Projekt gelöscht.**
-4. [ ] **UptimeRobot-Monitor löschen.** Zeigt auf `/api/ping` der nun
-       gelöschten Vercel-Domain und schlägt sonst dauerhaft Alarm. **Löschen,
-       nicht pausieren** — das Projekt kommt nicht zurück.
-5. [ ] **`.env` lokal verwerfen oder behalten** — die Keys sind wertlos.
+4. [x] **UptimeRobot-Monitor gelöscht.** Zeigte auf `/api/ping` der gelöschten
+       Vercel-Domain und hätte sonst dauerhaft Alarm geschlagen.
+5. [x] **Supabase-Account vollständig gelöscht**, nicht nur das Projekt —
+       Entscheid des Users, „sauberer". Der Account war zu dem Zeitpunkt leer
+       (null Projekte, Free-Plan). Damit ist auch das Personal Access Token
+       der MCP-Anbindung erledigt, das mit dem Account ungültig wird.
+       Konsequenz: ein Wiederaufbau beginnt mit der Account-Anlage.
+6. [ ] **`.env` lokal verwerfen oder behalten** — die Keys sind wertlos.
        Nicht ins Repo, in keinem Fall.
 
 **Nachtrag zur Vollständigkeit:** Der Monitor ist beim Aufstellen der
